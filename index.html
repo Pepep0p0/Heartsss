@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Multi-Colored Hearts</title>
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .heart {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: transparent;
+            border: none;
+            outline: none;
+            transform: rotate(45deg);
+        }
+
+        .heart::before,
+        .heart::after {
+            position: absolute;
+            content: "";
+            width: 50px;
+            height: 50px;
+            background-color: transparent;
+            border-radius: 50%;
+        }
+
+        .heart::before {
+            left: -25px;
+            top: 0;
+            background-color: #ff0000;
+        }
+
+        .heart::after {
+            left: 0;
+            top: -25px;
+            background-color: #ff00ff;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        function generateHearts(event) {
+            for (let i = 0; i < 200; i++) {
+                const heart = document.createElement("button");
+                heart.className = "heart";
+                heart.style.left = Math.random() * window.innerWidth + "px";
+                heart.style.top = Math.random() * window.innerHeight + "px";
+                document.body.appendChild(heart);
+            }
+        }
+
+        document.addEventListener("click", generateHearts);
+        document.addEventListener("touchstart", generateHearts);
+    </script>
+</body>
+</html>
