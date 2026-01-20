@@ -2,706 +2,342 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Museum of Us</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --p-pink: #ffafbd;
-            --p-rose: #ffc3a0;
-            --p-accent: #ff4b2b;
-            --p-gold: #ffd700;
-            --bg-soft: #fff5f7;
-            --ui-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --bg-color: #2c3e50;
+            --accent: #ff7043;
+            --proximity-color: rgba(255, 255, 255, 0.4);
+            --proximity-active: #ff7043;
         }
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg-soft);
-            font-family: var(--ui-font);
-        }
-
-        /* --- UI Screens --- */
-        .screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            z-index: 100;
-            background: white;
-            transition: opacity 0.5s ease;
-        }
-
-        #setup-screen { background: linear-gradient(to bottom, var(--p-pink), var(--p-rose)); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .hidden { display: none !important; opacity: 0; pointer-events: none; }
-
-        /* --- Character Setup UI --- */
-        .setup-card {
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-            width: 90%; max-width: 400px;
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-color);
+            overflow: hidden; touch-action: none;
         }
 
-        .hat-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 20px 0;
+        .screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #fdf6e3; z-index: 100; text-align: center; padding: 20px;
         }
 
-        .hat-option {
-            width: 60px; height: 60px;
-            border-radius: 10px;
-            cursor: pointer;
-            border: 3px solid transparent;
-            position: relative;
-            overflow: hidden;
+        .hidden { display: none !important; }
+
+        /* --- CHARACTER --- */
+        .chibi { 
+            position: absolute; width: 60px; height: 90px; 
+            transform: translate(-50%, -100%); transition: left 0.8s ease-out, top 0.8s ease-out;
+            z-index: 100; pointer-events: none;
+        }
+        .walking { animation: walkBob 0.2s infinite alternate; }
+        .flip { transform: translate(-50%, -100%) scaleX(-1); }
+
+        .c-head { width: 60px; height: 55px; background: #ffe0bd; border-radius: 20px; position: absolute; top: 0; left: 0; z-index: 10; }
+        .c-face { position: absolute; top: 25px; left: 10px; width: 40px; }
+        .c-eye { width: 8px; height: 10px; background: #3e2723; border-radius: 50%; position: absolute; }
+        .c-eye.left { left: 5px; } .c-eye.right { right: 5px; }
+        .c-mouth { width: 10px; height: 5px; border-bottom: 2px solid #3e2723; border-radius: 0 0 10px 10px; position: absolute; bottom: -8px; left: 15px; }
+        .c-body { width: 36px; height: 40px; background: #ff7043; position: absolute; top: 50px; left: 12px; border-radius: 15px 15px 5px 5px; z-index: 9; }
+        .c-hat { width: 80px; height: 40px; position: absolute; top: -15px; left: -10px; z-index: 12; border-radius: 40px 40px 0 0; }
+        .c-hat::after { content: ''; position: absolute; bottom: 0; left: -5px; width: 90px; height: 10px; background: inherit; border-radius: 20px; }
+
+        .hat-p1 { background: radial-gradient(#d32f2f 20%, transparent 20%), #fdd835; background-size: 10px 10px; }
+        .hat-p2 { background: radial-gradient(#fff 15%, transparent 16%), #e53935; background-size: 15px 15px; }
+        .hat-p3 { background: conic-gradient(from 45deg, #1a237e 25%, #3949ab 25% 50%, #1a237e 50% 75%, #3949ab 75%); background-size: 10px 10px; }
+        .hat-p4 { background: repeating-linear-gradient(45deg, #2e7d32, #2e7d32 8px, #a5d6a7 8px, #a5d6a7 16px); }
+
+        /* --- WORLD --- */
+        #game-world { width: 100%; height: 100%; position: relative; background: #000; overflow: hidden; }
+
+        .wall { height: 40%; width: 100%; position: relative; border-bottom: 12px solid #eee; display: flex; justify-content: space-around; align-items: center; }
+        .painting { width: 65px; height: 85px; background: #fff; border: 6px solid #5d4037; box-shadow: 2px 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        
+        .floor { height: 60%; width: 100%; position: relative; cursor: crosshair; }
+
+        /* PEDESTALS */
+        .pedestal-group {
+            position: absolute; width: 160px; height: 160px; transform: translate(-50%, -50%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 5; pointer-events: auto;
         }
 
-        .hat-option.selected { border-color: var(--p-accent); }
-
-        /* Hat Patterns */
-        .hat-yellow { background: yellow; }
-        .hat-yellow::after { content: ''; position: absolute; width: 100%; height: 100%; background-image: radial-gradient(red 20%, transparent 20%); background-size: 10px 10px; }
-        .hat-red { background: red; }
-        .hat-red::after { content: '🌸'; font-size: 10px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: space-around; }
-        .hat-blue { background: blue; }
-        .hat-blue::after { content: '⭐'; color: gold; font-size: 10px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: space-around; }
-        .hat-green { background: green; }
-        .hat-green::after { content: ''; position: absolute; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px); }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            outline: none;
+        .proximity-circle {
+            position: absolute; width: 150px; height: 80px; border: 4px dashed var(--proximity-color);
+            border-radius: 50%; top: 60%; left: 50%; transform: translate(-50%, -50%);
+            transition: all 0.3s ease; pointer-events: none;
         }
 
-        button {
-            background: var(--p-accent);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+        .near-player .proximity-circle { border: 5px solid var(--proximity-active); background: rgba(255, 112, 67, 0.15); box-shadow: 0 0 20px var(--proximity-active); }
 
-        button:active { transform: scale(0.95); }
+        .pedestal { width: 60px; height: 45px; background: linear-gradient(to right, #ccc, #fff, #ccc); border-radius: 4px; position: relative; z-index: 10; pointer-events: none;}
+        .pedestal::before { content: ''; position: absolute; top: -8px; left: -5px; width: 70px; height: 12px; background: #fff; border-radius: 4px; }
 
-        /* --- Game World --- */
-        #game-container {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: #eee;
-            touch-action: none;
-        }
+        .artifact-item { font-size: 2.8rem; margin-bottom: 5px; z-index: 11; filter: grayscale(100%) opacity(0.5); pointer-events: none; transition: 0.4s; }
+        .unlocked .artifact-item { filter: grayscale(0%) opacity(1); text-shadow: 0 0 15px gold; }
 
-        #header-ui {
-            position: absolute;
-            top: 0; left: 0; width: 100%;
-            padding: 15px;
-            display: flex; justify-content: space-between;
-            z-index: 50;
-            pointer-events: none;
-        }
+        /* --- UI --- */
+        .hud { position: absolute; top: 15px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 200; pointer-events: none; }
+        .hud-item { pointer-events: auto; background: #fff; padding: 8px 15px; border-radius: 20px; font-weight: bold; border: 2px solid #ddd; }
+        
+        .modal-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 300; }
+        .modal-box { background: white; width: 85%; max-width: 350px; padding: 25px; border-radius: 20px; text-align: center; border: 5px solid var(--accent); }
+        textarea { width: 100%; height: 80px; margin: 15px 0; border-radius: 10px; border: 2px solid #ddd; padding: 10px; font-family: inherit; }
 
-        .ui-box {
-            background: rgba(255,255,255,0.8);
-            backdrop-filter: blur(5px);
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-weight: bold;
-            pointer-events: auto;
-        }
+        @keyframes walkBob { from { transform: translate(-50%, -100%) translateY(0); } to { transform: translate(-50%, -100%) translateY(-8px); } }
 
-        #map {
-            width: 800px;
-            height: 800px;
-            position: absolute;
-            transition: background 0.5s;
-        }
+        .t1-wall { background: #fff9c4; } .t1-floor { background: #d7ccc8; }
+        .t2-wall { background: #fce4ec; } .t2-floor { background: #f8bbd0; }
+        .t3-wall { background: #e8eaf6; } .t3-floor { background: #c5cae9; }
+        .t4-wall { background: #eceff1; } .t4-floor { background: #b0bec5; }
+        .t5-wall { background: #fffde7; } .t5-floor { background: #fff59d; }
 
-        /* --- Character Avatar --- */
-        #player {
-            width: 50px;
-            height: 60px;
-            position: absolute;
-            z-index: 10;
-            transition: transform 0.1s linear;
-        }
-
-        .chibi-body {
-            width: 30px; height: 35px;
-            background: #ffccff; /* Default dress color */
-            border-radius: 15px 15px 5px 5px;
-            margin: 0 auto;
-            position: relative;
-            top: 20px;
-            box-shadow: 0 4px 5px rgba(0,0,0,0.1);
-        }
-
-        .chibi-head {
-            width: 34px; height: 34px;
-            background: #ffe0bd;
-            border-radius: 50%;
-            position: absolute;
-            top: -10px; left: -2px;
-        }
-
-        .chibi-face {
-            display: flex;
-            justify-content: space-around;
-            padding-top: 12px;
-        }
-
-        .eye { width: 4px; height: 4px; background: #333; border-radius: 50%; }
-        .smile { width: 10px; height: 5px; border-bottom: 2px solid #333; border-radius: 50%; margin: 2px auto; }
-
-        .chibi-hat {
-            width: 44px; height: 15px;
-            border-radius: 20px 20px 5px 5px;
-            position: absolute;
-            top: -15px; left: -7px;
-        }
-        .chibi-hat::before { /* Brim */
-            content: '';
-            position: absolute;
-            bottom: -3px; left: -10%;
-            width: 120%; height: 5px;
-            background: inherit;
-            border-radius: 50%;
-        }
-
-        /* --- Artifacts --- */
-        .artifact {
-            position: absolute;
-            width: 60px; height: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .pedestal {
-            width: 40px; height: 20px;
-            background: #ddd;
-            border-top: 4px solid #fff;
-            position: absolute;
-            bottom: 0;
-            border-radius: 4px;
-        }
-
-        .item-visual {
-            font-size: 30px;
-            filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
-            transition: 0.3s;
-        }
-
-        .unlocked .item-visual {
-            filter: drop-shadow(0 0 10px var(--p-gold));
-            animation: glow 1.5s infinite alternate;
-        }
-
-        @keyframes glow {
-            from { transform: scale(1); filter: drop-shadow(0 0 5px var(--p-gold)); }
-            to { transform: scale(1.1); filter: drop-shadow(0 0 15px gold); }
-        }
-
-        .interaction-circle {
-            position: absolute;
-            width: 100px; height: 100px;
-            border: 2px dashed rgba(255,255,255,0.4);
-            border-radius: 50%;
-            top: -10px; left: -20px;
-            pointer-events: none;
-            display: none;
-        }
-
-        .near .interaction-circle { display: block; }
-
-        /* --- Modal --- */
-        #modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-        }
-
-        .modal {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-        }
-
-        /* --- Controls --- */
-        #controls {
-            position: fixed;
-            bottom: 20px; left: 20px;
-            display: grid;
-            grid-template-columns: repeat(3, 50px);
-            gap: 10px;
-            z-index: 50;
-        }
-
-        .btn-ctrl {
-            width: 50px; height: 50px;
-            background: rgba(255,255,255,0.7);
-            border-radius: 10px;
-            display: flex; justify-content: center; align-items: center;
-            font-weight: bold; font-size: 20px;
-        }
-
-        #next-room-btn {
-            position: fixed;
-            bottom: 30px; right: 30px;
-            display: none;
-            background: #4CAF50;
-            z-index: 50;
-        }
-
-        /* --- Confetti --- */
-        .confetti {
-            position: fixed;
-            width: 10px; height: 10px;
-            background: red;
-            z-index: 999;
-            pointer-events: none;
-        }
-
-        /* --- Final Screen --- */
-        #final-screen {
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
-            overflow-y: auto;
-            padding: 40px 20px;
-        }
-
-        .coupon {
-            border: 5px dashed white;
-            padding: 20px;
-            margin: 20px 0;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
-        }
-
-        #answer-log {
-            text-align: left;
-            width: 100%;
-            max-width: 500px;
-            background: rgba(255,255,255,0.5);
-            padding: 15px;
-            border-radius: 10px;
-            font-size: 14px;
-        }
     </style>
 </head>
-<body oncontextmenu="return false">
+<body>
 
-    <div id="setup-screen" class="screen">
-        <div class="setup-card">
-            <h1>Museum of Us</h1>
-            <p>Enter your details to begin the journey</p>
-            <input type="text" id="fname" placeholder="First Name">
-            <input type="text" id="lname" placeholder="Last Name">
-            
-            <p>Pick a Sun Hat:</p>
-            <div class="hat-grid">
-                <div class="hat-option hat-yellow selected" onclick="selectHat('yellow', this)"></div>
-                <div class="hat-option hat-red" onclick="selectHat('red', this)"></div>
-                <div class="hat-option hat-blue" onclick="selectHat('blue', this)"></div>
-                <div class="hat-option hat-green" onclick="selectHat('green', this)"></div>
-            </div>
-
-            <button onclick="startGame()">Enter Museum</button>
-        </div>
+    <div class="hud">
+        <div class="hud-item" onclick="toggleMusic()">🎵 Music</div>
+        <div class="hud-item" style="color: #d32f2f;">💋 <span id="kisses">0</span></div>
     </div>
 
-    <div id="game-screen" class="screen hidden">
-        <div id="header-ui">
-            <div class="ui-box" id="room-name">The Foundation</div>
-            <div class="ui-box" id="kiss-counter">💋 0 Kisses</div>
-            <div class="ui-box" onclick="toggleMusic()" style="cursor:pointer">🎵 <span id="m-status">OFF</span></div>
+    <div id="screen-intro" class="screen">
+        <h1 style="font-size: 2.5rem; color: #5d4037;">Museum of Us</h1>
+        <p>A journey through the memories we've built.</p>
+        <button onclick="toCreator()" style="padding:15px 40px; border-radius:30px; background:var(--accent); color:white; border:none; font-weight:bold; cursor:pointer;">Enter Gallery</button>
+    </div>
+
+    <div id="screen-creator" class="screen hidden">
+        <h2>Visitor Registry</h2>
+        <div style="display:flex; flex-direction:column; gap:10px; width:260px; margin-bottom: 20px;">
+            <input type="text" id="fname" placeholder="First Name" style="padding:12px; border-radius:10px; border:2px solid #ddd; text-align:center;">
+            <input type="text" id="lname" placeholder="Last Name" style="padding:12px; border-radius:10px; border:2px solid #ddd; text-align:center;">
         </div>
 
-        <div id="game-container">
-            <div id="map">
-                <div id="player">
-                    <div class="chibi-hat" id="p-hat"></div>
-                    <div class="chibi-body">
-                        <div class="chibi-head">
-                            <div class="chibi-face">
-                                <div class="eye"></div>
-                                <div class="eye"></div>
-                            </div>
-                            <div class="smile"></div>
-                        </div>
-                    </div>
-                </div>
-                <div id="artifact-layer"></div>
+        <div style="height:150px; width:100px; position:relative; margin:10px;">
+            <div class="chibi" style="left:50%; top:100%;">
+                <div class="c-hat hat-p1" id="preview-hat"></div>
+                <div class="c-head"><div class="c-face"><div class="c-eye left"></div><div class="c-eye right"></div><div class="c-mouth"></div></div></div>
+                <div class="c-body" id="preview-body"></div>
             </div>
         </div>
 
-        <div id="controls">
-            <div></div><div class="btn-ctrl" ontouchstart="move('up')">↑</div><div></div>
-            <div class="btn-ctrl" ontouchstart="move('left')">←</div><div class="btn-ctrl" ontouchstart="move('down')">↓</div><div class="btn-ctrl" ontouchstart="move('right')">→</div>
+        <p>Choose your style:</p>
+        <div style="display:flex; gap:15px; margin-bottom: 25px;">
+            <div class="hat-p1" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p1')"></div>
+            <div class="hat-p2" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p2')"></div>
+            <div class="hat-p3" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p3')"></div>
+            <div class="hat-p4" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p4')"></div>
         </div>
-
-        <button id="next-room-btn" onclick="nextRoom()">Move to Next Room →</button>
+        <button onclick="startGame()" style="padding:15px 50px; border-radius:30px; background:#5d4037; color:white; border:none; font-weight:bold; cursor:pointer;">Begin Tour</button>
     </div>
 
-    <div id="modal-overlay">
-        <div class="modal">
-            <h3 id="modal-title">Artifact Question</h3>
-            <p id="modal-question"></p>
-            <input type="text" id="answer-input" placeholder="Type your response...">
-            <button onclick="submitAnswer()">Unlock Artifact</button>
+    <div id="game-world" class="hidden">
+        <div class="wall" id="room-wall">
+            <div class="painting">🎨</div>
+            <div id="room-name" style="background:white; padding:10px 20px; border-radius:10px; border:3px solid #5d4037; font-weight:bold;">The Foundation</div>
+            <div class="painting">📸</div>
         </div>
+        <div class="floor" id="room-floor" onclick="handleFloorClick(event)">
+            <div id="player" class="chibi" style="left:50%; top:90%;">
+                <div class="c-hat" id="g-hat"></div>
+                <div class="c-head"><div class="c-face"><div class="c-eye left"></div><div class="c-eye right"></div><div class="c-mouth"></div></div></div>
+                <div class="c-body" id="g-body"></div>
+            </div>
+            <div id="artifacts-layer"></div>
+        </div>
+        <button id="btn-next" onclick="nextRoom()" style="position:absolute; bottom:25px; right:25px; padding:15px 35px; background:var(--accent); color:white; border:none; border-radius:30px; display:none; cursor:pointer; font-weight:bold; box-shadow: 0 4px 0 #d84315;">Next Room ➜</button>
     </div>
 
-    <div id="final-screen" class="screen hidden">
-        <h1 id="valentine-text">Will you be my Valentine?</h1>
-        <div class="coupon">
-            <h2 id="final-kiss-count">X Kisses</h2>
-            <p>This coupon is valid for a lifetime of love.</p>
+    <div id="screen-finale" class="screen hidden">
+        <h1 style="color: #d32f2f;">Happy Valentine's Day! ❤️</h1>
+        <h2 id="finale-name">Full Name</h2>
+        <div style="background: white; padding: 30px; border-radius: 20px; border: 5px solid #ff7043; max-width: 400px; line-height: 1.6;">
+            <p>You have successfully explored all the galleries of our history. Through every spark, every distance, and every moment of growth, we've built something beautiful.</p>
+            <h3 style="margin-bottom:0;">Kisses Earned: <span id="final-kisses"></span> 💋</h3>
+            <hr>
+            <p><i>"To many more galleries yet to be filled with memories."</i></p>
         </div>
-        
-        <label style="margin: 20px 0; display: block; cursor:pointer;">
-            <input type="checkbox" id="agree-check"> I agree to send Dedso rupiya
-        </label>
+        <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; border:none; background:#5d4037; color:white; border-radius:10px;">Visit Again</button>
+    </div>
 
-        <button id="submit-valentine" onclick="finishGame()">Yes, I Accept!</button>
-
-        <h3>Our Memories</h3>
-        <div id="answer-log"></div>
+    <div id="modal" class="modal-wrap hidden">
+        <div class="modal-box">
+            <h3 id="m-title" style="color:var(--accent);">Memory</h3>
+            <p id="m-q" style="font-weight:bold;"></p>
+            <textarea id="m-ans" placeholder="Your answer is the key to this memory..."></textarea>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button onclick="closeModal()" style="background:#eee; border:none; padding:10px 20px; border-radius:10px;">Not yet</button>
+                <button onclick="saveMemory()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">Unlock Memory</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- GAME DATA ---
-        const rooms = [
-            { 
-                name: "Room 1: The Foundation", 
-                floor: "radial-gradient(circle, #fdfcfb 0%, #e2d1c3 100%)",
-                items: [
-                    { id: 0, icon: "💌", name: "Message in a Bottle", q: "What's a memory from our friendship that still makes you smile?" },
-                    { id: 1, icon: "🌸", name: "Early Petals", q: "When did you first suspect we might be more than friends?" },
-                    { id: 2, icon: "☕", name: "First Coffee", q: "What quality did you admire in me before we started dating?" }
-                ]
-            },
-            { 
-                name: "Room 2: The Spark", 
-                floor: "repeating-conic-gradient(#ffecd2 0% 25%, #fcb69f 0% 50%) 50% / 100px 100px",
-                items: [
-                    { id: 3, icon: "💫", name: "Confession Night", q: "What moment from our early days feels like pure magic?" },
-                    { id: 4, icon: "🌙", name: "New Beginnings", q: "When did you realize this wasn't just a fleeting feeling?" },
-                    { id: 5, icon: "🎵", name: "Our First Song", q: "What's something small from our first dates you treasure?" }
-                ]
-            },
-            { 
-                name: "Room 3: Distance & Love", 
-                floor: "linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)",
-                items: [
-                    { id: 6, icon: "📱", name: "Late Night Calls", q: "What helped you feel my presence most when we were miles apart?" },
-                    { id: 7, icon: "✈️", name: "Miles Apart", q: "How did our time apart change the way you think about 'home'?" },
-                    { id: 8, icon: "💝", name: "Waiting Heart", q: "What did you learn about our love during the hardest separation?" }
-                ]
-            },
-            { 
-                name: "Room 4: Growing Together", 
-                floor: "radial-gradient(circle, #d4fc79 0%, #96e6a1 100%)",
-                items: [
-                    { id: 9, icon: "🌱", name: "Lessons Learned", q: "What have our disagreements taught you about compromise?" },
-                    { id: 10, icon: "🌈", name: "After the Storm", q: "How do you feel when we find our way back after a difficult moment?" },
-                    { id: 11, icon: "🤝", name: "Understanding", q: "What's something you've grown to love that once frustrated you?" }
-                ]
-            },
-            { 
-                name: "Room 5: Forever & Always", 
-                floor: "linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",
-                items: [
-                    { id: 12, icon: "🏡", name: "Future Home", q: "What dream of yours feels incomplete without me in it?" },
-                    { id: 13, icon: "🔮", name: "Our Dreams", q: "What are you most excited to build together as we move forward?" },
-                    { id: 14, icon: "💍", name: "Forever", q: "What does 'forever' look like through your eyes?" }
-                ]
-            }
+        const ROOMS = [
+            { name: "The Foundation", theme: "t1", icons: ["💌", "🌸", "☕"], questions: ["What was the very first thought you had when we met?", "What small habit of mine made you realize we were becoming close?", "What is a 'foundation' memory that makes you feel safe with us?"] },
+            { name: "The Spark", theme: "t2", icons: ["💫", "🌙", "🎵"], questions: ["Recall the moment the 'spark' turned into a fire. Where were we?", "What song instantly takes you back to our earliest, most exciting days?", "What was the most 'magical' date we've ever been on?"] },
+            { name: "Distance", theme: "t3", icons: ["📱", "✈️", "💝"], questions: ["What was the hardest part of being apart, and how did we fix it?", "Describe the feeling of seeing me for the first time after a long time away.", "What is a 'distance' lesson that made our bond stronger?"] },
+            { name: "Growing", theme: "t4", icons: ["🌱", "🌈", "🤝"], questions: ["What is a challenge we overcame that you're most proud of?", "How have I helped you grow into the person you are today?", "What is a compromise we made that actually made life better?"] },
+            { name: "Forever", theme: "t5", icons: ["🏡", "🔮", "💍"], questions: ["If we could build our dream life anywhere, what does it look like?", "What is one promise you want to keep to me for the rest of our lives?", "What are you most excited to experience with me in 10 years?"] }
         ];
 
-        let state = {
-            roomIndex: 0,
-            x: 400, y: 400,
-            kisses: 0,
-            unlockedInRoom: [],
-            allAnswers: {},
-            hat: 'yellow',
-            user: { f: '', l: '' },
-            music: false
-        };
+        let state = { room: 0, unlocked: [], kisses: 0, hat: 'hat-p1', fname: '', lname: '' };
+        let pedestals = [];
+        let activeItem = null;
 
-        const playerEl = document.getElementById('player');
-        const mapEl = document.getElementById('map');
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        let osc;
+        function toCreator() { 
+            document.getElementById('screen-intro').classList.add('hidden'); 
+            document.getElementById('screen-creator').classList.remove('hidden'); 
+        }
 
-        // --- CORE FUNCTIONS ---
-
-        function selectHat(color, el) {
-            state.hat = color;
-            document.querySelectorAll('.hat-option').forEach(opt => opt.classList.remove('selected'));
-            el.classList.add('selected');
-            document.getElementById('p-hat').className = 'chibi-hat hat-' + color;
+        function setHat(h) { 
+            state.hat = h; 
+            document.getElementById('preview-hat').className = 'c-hat ' + h; 
         }
 
         function startGame() {
-            state.user.f = document.getElementById('fname').value.trim();
-            state.user.l = document.getElementById('lname').value.trim();
-            if (!state.user.f || !state.user.l) return alert("Please enter your name!");
-
-            // Secret Bonus
-            if (state.user.f.toLowerCase() === 'amena' && state.user.l.toLowerCase() === 'farooq') {
-                state.kisses += 10;
-                updateKisses();
-            }
-
-            document.getElementById('setup-screen').classList.add('hidden');
-            document.getElementById('game-screen').classList.remove('hidden');
-            loadRoom(0);
-            updatePlayer();
+            state.fname = document.getElementById('fname').value;
+            state.lname = document.getElementById('lname').value;
+            if(!state.fname || !state.lname) return alert("Both names are required for the visitor log!");
+            
+            document.getElementById('screen-creator').classList.add('hidden');
+            document.getElementById('game-world').classList.remove('hidden');
+            document.getElementById('g-hat').className = 'c-hat ' + state.hat;
+            loadRoom();
         }
 
-        function loadRoom(idx) {
-            state.roomIndex = idx;
-            state.unlockedInRoom = [];
-            const room = rooms[idx];
-            document.getElementById('room-name').innerText = room.name;
-            mapEl.style.background = room.floor;
-            document.getElementById('next-room-btn').style.display = 'none';
-
-            // Generate Artifacts
-            const layer = document.getElementById('artifact-layer');
-            layer.innerHTML = '';
+        function loadRoom() {
+            const r = ROOMS[state.room];
+            document.getElementById('room-wall').className = 'wall ' + r.theme + '-wall';
+            document.getElementById('room-floor').className = 'floor ' + r.theme + '-floor';
+            document.getElementById('room-name').innerText = r.name;
             
-            const positions = [{x:200, y:200}, {x:500, y:300}, {x:300, y:600}];
-            room.items.forEach((item, i) => {
-                const art = document.createElement('div');
-                art.className = 'artifact';
-                art.id = 'art-' + item.id;
-                art.style.left = positions[i].x + 'px';
-                art.style.top = positions[i].y + 'px';
-                art.innerHTML = `
-                    <div class="interaction-circle"></div>
-                    <div class="item-visual">${item.icon}</div>
+            const layer = document.getElementById('artifacts-layer');
+            layer.innerHTML = '';
+            pedestals = [];
+            
+            const pos = [{x:20, y:30}, {x:50, y:70}, {x:80, y:30}];
+            
+            r.icons.forEach((icon, i) => {
+                const id = `${state.room}-${i}`;
+                const unlocked = state.unlocked.includes(id);
+                const group = document.createElement('div');
+                group.id = "pedestal-" + id;
+                group.className = 'pedestal-group ' + (unlocked ? 'unlocked' : '');
+                group.style.left = pos[i].x + '%';
+                group.style.top = pos[i].y + '%';
+                group.style.zIndex = Math.floor(pos[i].y);
+                
+                group.innerHTML = `
+                    <div class="proximity-circle"></div>
+                    <div class="artifact-item">${icon}</div>
                     <div class="pedestal"></div>
                 `;
-                art.dataset.qid = item.id;
-                layer.appendChild(art);
+
+                group.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    handleArtifactClick(pos[i], id, r.questions[i], icon);
+                });
+
+                layer.appendChild(group);
+                pedestals.push({pos: pos[i], id: id, q: r.questions[i], icon: icon});
             });
-            
-            // Center player
-            state.x = 400; state.y = 400;
-            updatePlayer();
+            updateHUD();
         }
 
-        function updatePlayer() {
-            playerEl.style.left = state.x + 'px';
-            playerEl.style.top = state.y + 'px';
-            
-            // Boundary checks
-            if (state.x < 50) state.x = 50; if (state.x > 750) state.x = 750;
-            if (state.y < 50) state.y = 50; if (state.y > 750) state.y = 750;
+        function handleFloorClick(e) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = ((e.clientX - rect.left) / rect.width) * 100;
+            const y = ((e.clientY - rect.top) / rect.height) * 100;
+            movePlayer(x, y);
+        }
 
-            // Proximity Check
-            const artifacts = document.querySelectorAll('.artifact');
-            artifacts.forEach(art => {
-                const ax = parseInt(art.style.left);
-                const ay = parseInt(art.style.top);
-                const dist = Math.sqrt((state.x - ax)**2 + (state.y - ay)**2);
-                
-                if (dist < 70) {
-                    art.classList.add('near');
-                    currentNearArtifact = art;
-                } else {
-                    art.classList.remove('near');
+        function handleArtifactClick(pos, id, q, name) {
+            movePlayer(pos.x, pos.y + 5); 
+            setTimeout(() => {
+                const player = document.getElementById('player');
+                const px = parseFloat(player.style.left);
+                const py = parseFloat(player.style.top);
+                const dist = Math.sqrt(Math.pow(px - pos.x, 2) + Math.pow(py - pos.y, 2));
+
+                if (dist < 22) {
+                    if(state.unlocked.includes(id)) return;
+                    activeItem = {id, q, name};
+                    document.getElementById('m-title').innerText = name;
+                    document.getElementById('m-q').innerText = q;
+                    document.getElementById('modal').classList.remove('hidden');
                 }
+            }, 850);
+        }
+
+        function movePlayer(x, y) {
+            const player = document.getElementById('player');
+            const currentX = parseFloat(player.style.left) || 50;
+            
+            // Flip character
+            if (x < currentX) player.classList.add('flip');
+            else player.classList.remove('flip');
+
+            player.style.left = x + '%';
+            player.style.top = y + '%';
+            player.style.zIndex = Math.floor(y);
+            player.classList.add('walking');
+            
+            const interval = setInterval(() => updateProximity(x, y), 50);
+            setTimeout(() => {
+                player.classList.remove('walking');
+                clearInterval(interval);
+                updateProximity(x, y);
+            }, 800);
+        }
+
+        function updateProximity(px, py) {
+            pedestals.forEach(p => {
+                const dist = Math.sqrt(Math.pow(px - p.pos.x, 2) + Math.pow(py - p.pos.y, 2));
+                const el = document.getElementById("pedestal-" + p.id);
+                if (dist < 20) el.classList.add('near-player');
+                else el.classList.remove('near-player');
             });
         }
 
-        let currentNearArtifact = null;
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
-        function move(dir) {
-            const step = 20;
-            if (dir === 'up') state.y -= step;
-            if (dir === 'down') state.y += step;
-            if (dir === 'left') { state.x -= step; playerEl.style.transform = 'scaleX(1)'; }
-            if (dir === 'right') { state.x += step; playerEl.style.transform = 'scaleX(-1)'; }
-            updatePlayer();
-        }
-
-        // Keyboard support
-        window.addEventListener('keydown', (e) => {
-            if (document.getElementById('modal-overlay').style.display === 'flex') {
-                if (e.key === 'Escape') closeModal();
-                if (e.key === 'Enter') submitAnswer();
-                return;
-            }
-            if (e.key === 'ArrowUp' || e.key === 'w') move('up');
-            if (e.key === 'ArrowDown' || e.key === 's') move('down');
-            if (e.key === 'ArrowLeft' || e.key === 'a') move('left');
-            if (e.key === 'ArrowRight' || e.key === 'd') move('right');
-            if (e.key === 'e' || e.key === ' ') interact();
-        });
-
-        function interact() {
-            if (currentNearArtifact && currentNearArtifact.classList.contains('near')) {
-                const qid = currentNearArtifact.dataset.qid;
-                const item = rooms.flatMap(r => r.items).find(i => i.id == qid);
-                
-                document.getElementById('modal-title').innerText = item.name;
-                document.getElementById('modal-question').innerText = item.q;
-                document.getElementById('answer-input').value = '';
-                document.getElementById('modal-overlay').style.display = 'flex';
-                document.getElementById('answer-input').focus();
-            }
-        }
-
-        // Tap on artifact also works for mobile
-        mapEl.addEventListener('click', (e) => {
-            if (e.target.closest('.artifact')) {
-                interact();
-            }
-        });
-
-        function closeModal() {
-            document.getElementById('modal-overlay').style.display = 'none';
-        }
-
-        function submitAnswer() {
-            const ans = document.getElementById('answer-input').value.trim();
-            if (!ans) return alert("Please share a thought!");
-
-            const qid = currentNearArtifact.dataset.qid;
-            state.allAnswers[qid] = ans;
+        function saveMemory() {
+            if(!document.getElementById('m-ans').value) return;
+            state.unlocked.push(activeItem.id);
+            state.kisses++;
+            document.getElementById('modal').classList.add('hidden');
+            document.getElementById('m-ans').value = '';
+            loadRoom();
             
-            if (!state.unlockedInRoom.includes(qid)) {
-                state.unlockedInRoom.push(qid);
-                state.kisses++;
-                updateKisses();
-                currentNearArtifact.classList.add('unlocked');
-                createConfetti();
+            const roomIds = [0,1,2].map(i => `${state.room}-${i}`);
+            if(roomIds.every(id => state.unlocked.includes(id))) {
+                document.getElementById('btn-next').style.display = 'block';
             }
-
-            closeModal();
-
-            if (state.unlockedInRoom.length === 3) {
-                document.getElementById('next-room-btn').style.display = 'block';
-            }
-        }
-
-        function updateKisses() {
-            document.getElementById('kiss-counter').innerText = `💋 ${state.kisses} Kisses`;
         }
 
         function nextRoom() {
-            if (state.roomIndex < 4) {
-                loadRoom(state.roomIndex + 1);
+            state.room++;
+            if(state.room >= ROOMS.length) {
+                document.getElementById('game-world').classList.add('hidden');
+                document.getElementById('screen-finale').classList.remove('hidden');
+                document.getElementById('finale-name').innerText = state.fname + " " + state.lname;
+                document.getElementById('final-kisses').innerText = state.kisses;
             } else {
-                showFinal();
+                document.getElementById('btn-next').style.display = 'none';
+                loadRoom();
             }
         }
 
-        function showFinal() {
-            document.getElementById('game-screen').classList.add('hidden');
-            document.getElementById('final-screen').classList.remove('hidden');
-            document.getElementById('final-kiss-count').innerText = `${state.kisses} Kisses Earned`;
-            
-            const log = document.getElementById('answer-log');
-            log.innerHTML = '';
-            rooms.forEach((room, rIdx) => {
-                log.innerHTML += `<h4>${room.name}</h4>`;
-                room.items.forEach(item => {
-                    log.innerHTML += `<p><b>Q:</b> ${item.q}<br><b>A:</b> ${state.allAnswers[item.id]}</p>`;
-                });
-            });
-        }
-
-        function finishGame() {
-            if (!document.getElementById('agree-check').checked) {
-                alert("You must agree to send Dedso rupiya!");
-                return;
-            }
-            createConfetti();
-            alert("Happy Valentine's Day! ❤️ Screenshot your coupon!");
-        }
-
-        // --- EXTRAS ---
-
-        function createConfetti() {
-            for (let i = 0; i < 30; i++) {
-                const c = document.createElement('div');
-                c.className = 'confetti';
-                c.style.left = Math.random() * 100 + 'vw';
-                c.style.top = '-10px';
-                c.style.backgroundColor = ['#ff4b2b', '#ffd700', '#ffc3a0', '#ffafbd'][Math.floor(Math.random()*4)];
-                document.body.appendChild(c);
-                
-                const anim = c.animate([
-                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
-                    { transform: `translateY(100vh) rotate(${Math.random()*360}deg)`, opacity: 0 }
-                ], { duration: 2000 + Math.random()*1000 });
-                anim.onfinish = () => c.remove();
-            }
-        }
-
-        function toggleMusic() {
-            state.music = !state.music;
-            document.getElementById('m-status').innerText = state.music ? "ON" : "OFF";
-            if (state.music) {
-                playSimpleTune();
-            } else {
-                if (osc) osc.stop();
-            }
-        }
-
-        function playSimpleTune() {
-            if (!state.music) return;
-            osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            gain.gain.value = 0.05;
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(261.63, audioCtx.currentTime); // C4
-            osc.start();
-        }
-
-        // Prevent iOS bounce
-        document.addEventListener('touchmove', (e) => {
-            if (e.target.id === 'final-screen' || e.target.closest('#final-screen')) return;
-            e.preventDefault();
-        }, { passive: false });
-
+        function updateHUD() { document.getElementById('kisses').innerText = state.kisses; }
+        function toggleMusic() { alert("🎵 Switched to chill museum lo-fi..."); }
     </script>
 </body>
 </html>
-
