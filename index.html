@@ -4,41 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Museum of Us</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-color: #2c3e50;
-            --accent: #ff7043;
-            --proximity-color: rgba(255, 255, 255, 0.4);
-            --proximity-active: #ff7043;
-        }
-
+        :root { --bg: #fdf6e3; --accent: #ff7043; --pink: #ff8a80; --gold: #ffd700; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            font-family: 'Nunito', sans-serif;
-            background: var(--bg-color);
-            overflow: hidden; touch-action: none;
-        }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: #2c3e50; overflow: hidden; touch-action: none; }
 
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            background: #fdf6e3; z-index: 100; text-align: center; padding: 20px;
-        }
-
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--bg); z-index: 100; text-align: center; padding: 20px; }
         .hidden { display: none !important; }
 
         /* --- CHARACTER --- */
-        .chibi { 
-            position: absolute; width: 60px; height: 90px; 
-            transform: translate(-50%, -100%); transition: left 0.8s ease-out, top 0.8s ease-out;
-            z-index: 100; pointer-events: none;
-        }
+        .chibi { position: absolute; width: 60px; height: 90px; transform: translate(-50%, -100%); transition: left 0.8s ease-out, top 0.8s ease-out; z-index: 100; pointer-events: none; }
         .walking { animation: walkBob 0.2s infinite alternate; }
         .flip { transform: translate(-50%, -100%) scaleX(-1); }
-
         .c-head { width: 60px; height: 55px; background: #ffe0bd; border-radius: 20px; position: absolute; top: 0; left: 0; z-index: 10; }
         .c-face { position: absolute; top: 25px; left: 10px; width: 40px; }
         .c-eye { width: 8px; height: 10px; background: #3e2723; border-radius: 50%; position: absolute; }
@@ -48,100 +26,86 @@
         .c-hat { width: 80px; height: 40px; position: absolute; top: -15px; left: -10px; z-index: 12; border-radius: 40px 40px 0 0; }
         .c-hat::after { content: ''; position: absolute; bottom: 0; left: -5px; width: 90px; height: 10px; background: inherit; border-radius: 20px; }
 
+        /* Styles */
         .hat-p1 { background: radial-gradient(#d32f2f 20%, transparent 20%), #fdd835; background-size: 10px 10px; }
         .hat-p2 { background: radial-gradient(#fff 15%, transparent 16%), #e53935; background-size: 15px 15px; }
         .hat-p3 { background: conic-gradient(from 45deg, #1a237e 25%, #3949ab 25% 50%, #1a237e 50% 75%, #3949ab 75%); background-size: 10px 10px; }
-        .hat-p4 { background: repeating-linear-gradient(45deg, #2e7d32, #2e7d32 8px, #a5d6a7 8px, #a5d6a7 16px); }
+        .dress-1 { background: #ff7043; } .dress-2 { background: #9c27b0; } .dress-3 { background: #2196f3; } .dress-4 { background: #4caf50; }
 
         /* --- WORLD --- */
         #game-world { width: 100%; height: 100%; position: relative; background: #000; overflow: hidden; }
-
         .wall { height: 40%; width: 100%; position: relative; border-bottom: 12px solid #eee; display: flex; justify-content: space-around; align-items: center; }
         .painting { width: 65px; height: 85px; background: #fff; border: 6px solid #5d4037; box-shadow: 2px 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        
         .floor { height: 60%; width: 100%; position: relative; cursor: crosshair; }
 
-        /* PEDESTALS */
-        .pedestal-group {
-            position: absolute; width: 160px; height: 160px; transform: translate(-50%, -50%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 5; pointer-events: auto;
-        }
-
-        .proximity-circle {
-            position: absolute; width: 150px; height: 80px; border: 4px dashed var(--proximity-color);
-            border-radius: 50%; top: 60%; left: 50%; transform: translate(-50%, -50%);
-            transition: all 0.3s ease; pointer-events: none;
-        }
-
-        .near-player .proximity-circle { border: 5px solid var(--proximity-active); background: rgba(255, 112, 67, 0.15); box-shadow: 0 0 20px var(--proximity-active); }
-
+        .pedestal-group { position: absolute; width: 160px; height: 160px; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
+        .proximity-circle { position: absolute; width: 150px; height: 80px; border: 4px dashed rgba(255,255,255,0.4); border-radius: 50%; top: 60%; left: 50%; transform: translate(-50%, -50%); transition: 0.3s; pointer-events: none; }
+        .near-player .proximity-circle { border: 5px solid var(--accent); background: rgba(255,112,67,0.15); box-shadow: 0 0 20px var(--accent); }
         .pedestal { width: 60px; height: 45px; background: linear-gradient(to right, #ccc, #fff, #ccc); border-radius: 4px; position: relative; z-index: 10; pointer-events: none;}
-        .pedestal::before { content: ''; position: absolute; top: -8px; left: -5px; width: 70px; height: 12px; background: #fff; border-radius: 4px; }
-
-        .artifact-item { font-size: 2.8rem; margin-bottom: 5px; z-index: 11; filter: grayscale(100%) opacity(0.5); pointer-events: none; transition: 0.4s; }
+        .artifact-item { font-size: 2.8rem; margin-bottom: 5px; z-index: 11; filter: grayscale(100%) opacity(0.5); animation: float 3s ease-in-out infinite; transition: 0.4s; }
         .unlocked .artifact-item { filter: grayscale(0%) opacity(1); text-shadow: 0 0 15px gold; }
 
-        /* --- UI --- */
+        /* --- VALENTINE COUPON --- */
+        .coupon-card { background: white; border: 8px double #ff8a80; padding: 30px; border-radius: 15px; max-width: 350px; box-shadow: 10px 10px 0px #ffcdd2; position: relative; }
+        .coupon-card h2 { font-family: 'Pacifico', cursive; color: #d32f2f; margin: 0; }
+        .stamp { position: absolute; bottom: -10px; right: -10px; transform: rotate(-15deg); background: #d32f2f; color: white; padding: 5px 15px; font-weight: bold; border-radius: 5px; border: 2px dashed white; }
+
+        .particle { position: absolute; pointer-events: none; z-index: 200; font-size: 1.5rem; animation: particle-fly 1s ease-out forwards; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes walkBob { from { transform: translate(-50%, -100%) translateY(0); } to { transform: translate(-50%, -100%) translateY(-8px); } }
+        @keyframes particle-fly { 0% { opacity: 1; transform: translate(0,0) scale(1); } 100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.5); } }
+
         .hud { position: absolute; top: 15px; left: 0; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 200; pointer-events: none; }
         .hud-item { pointer-events: auto; background: #fff; padding: 8px 15px; border-radius: 20px; font-weight: bold; border: 2px solid #ddd; }
         
-        .modal-wrap { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center; z-index: 300; }
-        .modal-box { background: white; width: 85%; max-width: 350px; padding: 25px; border-radius: 20px; text-align: center; border: 5px solid var(--accent); }
-        textarea { width: 100%; height: 80px; margin: 15px 0; border-radius: 10px; border: 2px solid #ddd; padding: 10px; font-family: inherit; }
-
-        @keyframes walkBob { from { transform: translate(-50%, -100%) translateY(0); } to { transform: translate(-50%, -100%) translateY(-8px); } }
-
         .t1-wall { background: #fff9c4; } .t1-floor { background: #d7ccc8; }
         .t2-wall { background: #fce4ec; } .t2-floor { background: #f8bbd0; }
         .t3-wall { background: #e8eaf6; } .t3-floor { background: #c5cae9; }
         .t4-wall { background: #eceff1; } .t4-floor { background: #b0bec5; }
         .t5-wall { background: #fffde7; } .t5-floor { background: #fff59d; }
-
     </style>
 </head>
 <body>
 
     <div class="hud">
-        <div class="hud-item" onclick="toggleMusic()">🎵 Music</div>
+        <div class="hud-item" onclick="alert('🎵 Playing Lo-Fi Love Beats...')">🎵 Music</div>
         <div class="hud-item" style="color: #d32f2f;">💋 <span id="kisses">0</span></div>
     </div>
 
-    <div id="screen-intro" class="screen">
-        <h1 style="font-size: 2.5rem; color: #5d4037;">Museum of Us</h1>
-        <p>A journey through the memories we've built.</p>
-        <button onclick="toCreator()" style="padding:15px 40px; border-radius:30px; background:var(--accent); color:white; border:none; font-weight:bold; cursor:pointer;">Enter Gallery</button>
-    </div>
-
-    <div id="screen-creator" class="screen hidden">
-        <h2>Visitor Registry</h2>
-        <div style="display:flex; flex-direction:column; gap:10px; width:260px; margin-bottom: 20px;">
-            <input type="text" id="fname" placeholder="First Name" style="padding:12px; border-radius:10px; border:2px solid #ddd; text-align:center;">
-            <input type="text" id="lname" placeholder="Last Name" style="padding:12px; border-radius:10px; border:2px solid #ddd; text-align:center;">
+    <div id="screen-creator" class="screen">
+        <h2>Valentine Guestbook</h2>
+        <div style="display:flex; flex-direction:column; gap:8px; width:260px; margin-bottom: 10px;">
+            <input type="text" id="fname" placeholder="First Name" style="padding:10px; border-radius:10px; border:2px solid #ddd; text-align:center;">
+            <input type="text" id="lname" placeholder="Last Name" style="padding:10px; border-radius:10px; border:2px solid #ddd; text-align:center;">
         </div>
 
-        <div style="height:150px; width:100px; position:relative; margin:10px;">
+        <div style="height:140px; width:100px; position:relative; margin:10px;">
             <div class="chibi" style="left:50%; top:100%;">
-                <div class="c-hat hat-p1" id="preview-hat"></div>
+                <div class="c-hat hat-p1" id="p-hat"></div>
                 <div class="c-head"><div class="c-face"><div class="c-eye left"></div><div class="c-eye right"></div><div class="c-mouth"></div></div></div>
-                <div class="c-body" id="preview-body"></div>
+                <div class="c-body" id="p-body"></div>
             </div>
         </div>
 
-        <p>Choose your style:</p>
-        <div style="display:flex; gap:15px; margin-bottom: 25px;">
-            <div class="hat-p1" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p1')"></div>
-            <div class="hat-p2" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p2')"></div>
-            <div class="hat-p3" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p3')"></div>
-            <div class="hat-p4" style="width:45px; height:45px; border-radius:50%; border:3px solid white; cursor:pointer;" onclick="setHat('hat-p4')"></div>
+        <p style="margin:2px; font-weight:bold;">Pick Hat & Outfit:</p>
+        <div style="display:flex; gap:10px; margin-bottom: 10px;">
+            <div class="hat-p1" style="width:35px; height:35px; border-radius:50%; cursor:pointer;" onclick="setHat('hat-p1')"></div>
+            <div class="hat-p2" style="width:35px; height:35px; border-radius:50%; cursor:pointer;" onclick="setHat('hat-p2')"></div>
+            <div class="hat-p3" style="width:35px; height:35px; border-radius:50%; cursor:pointer;" onclick="setHat('hat-p3')"></div>
         </div>
-        <button onclick="startGame()" style="padding:15px 50px; border-radius:30px; background:#5d4037; color:white; border:none; font-weight:bold; cursor:pointer;">Begin Tour</button>
+        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+            <div class="dress-1" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-1')"></div>
+            <div class="dress-2" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-2')"></div>
+            <div class="dress-3" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-3')"></div>
+            <div class="dress-4" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-4')"></div>
+        </div>
+        <button onclick="startGame()" style="padding:12px 40px; border-radius:30px; background:var(--accent); color:white; border:none; font-weight:bold; cursor:pointer;">Enter Museum</button>
     </div>
 
     <div id="game-world" class="hidden">
         <div class="wall" id="room-wall">
             <div class="painting">🎨</div>
-            <div id="room-name" style="background:white; padding:10px 20px; border-radius:10px; border:3px solid #5d4037; font-weight:bold;">The Foundation</div>
+            <div id="room-name" style="background:white; padding:10px 20px; border-radius:10px; border:3px solid #5d4037; font-weight:bold;">Gallery</div>
             <div class="painting">📸</div>
         </div>
         <div class="floor" id="room-floor" onclick="handleFloorClick(event)">
@@ -152,64 +116,71 @@
             </div>
             <div id="artifacts-layer"></div>
         </div>
-        <button id="btn-next" onclick="nextRoom()" style="position:absolute; bottom:25px; right:25px; padding:15px 35px; background:var(--accent); color:white; border:none; border-radius:30px; display:none; cursor:pointer; font-weight:bold; box-shadow: 0 4px 0 #d84315;">Next Room ➜</button>
+        <button id="btn-next" onclick="nextRoom()" style="position:absolute; bottom:25px; right:25px; padding:15px 35px; background:var(--accent); color:white; border:none; border-radius:30px; display:none; cursor:pointer; font-weight:bold;">Next Room ➜</button>
     </div>
 
-    <div id="screen-finale" class="screen hidden">
-        <h1 style="color: #d32f2f;">Happy Valentine's Day! ❤️</h1>
-        <h2 id="finale-name">Full Name</h2>
-        <div style="background: white; padding: 30px; border-radius: 20px; border: 5px solid #ff7043; max-width: 400px; line-height: 1.6;">
-            <p>You have successfully explored all the galleries of our history. Through every spark, every distance, and every moment of growth, we've built something beautiful.</p>
-            <h3 style="margin-bottom:0;">Kisses Earned: <span id="final-kisses"></span> 💋</h3>
-            <hr>
-            <p><i>"To many more galleries yet to be filled with memories."</i></p>
+    <div id="screen-proposal" class="screen hidden">
+        <h1 style="color:#d32f2f;">Final Step...</h1>
+        <div style="background:white; padding:30px; border-radius:20px; border:4px solid var(--accent); max-width:350px;">
+            <h3>Will you be my Valentine?</h3>
+            <select id="v-choice" style="padding:10px; width:100%; border-radius:10px; margin-bottom:15px; font-size:1.1rem;">
+                <option value="yes">Yes</option>
+                <option value="YES">YES</option>
+            </select>
+            <label style="display:block; margin-bottom:20px; font-size:0.9rem;">
+                <input type="checkbox" id="money-agree"> I agree to send Dedso rupiya (₹150)
+            </label>
+            <button onclick="showFinale()" style="background:#d32f2f; color:white; padding:12px 30px; border:none; border-radius:10px; font-weight:bold;">SIGN & CLAIM</button>
         </div>
-        <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; border:none; background:#5d4037; color:white; border-radius:10px;">Visit Again</button>
     </div>
 
-    <div id="modal" class="modal-wrap hidden">
-        <div class="modal-box">
+    <div id="screen-finale" class="screen hidden" style="background:#ffebee;">
+        <div class="coupon-card">
+            <h2>Love Coupon</h2>
+            <p>This coupon entitles the bearer to:</p>
+            <h1 style="margin:10px 0; color:#ff7043;">ONE INFINITE HUG</h1>
+            <p>And a lifetime of memories.</p>
+            <hr>
+            <p>Issued to: <b id="final-name"></b></p>
+            <p>Score: <b id="final-kisses"></b> Kisses 💋</p>
+            <div class="stamp">OFFICIAL YES</div>
+        </div>
+        <button onclick="location.reload()" style="margin-top:30px; color:#d32f2f; background:none; border:none; text-decoration:underline;">Revisit Memories</button>
+    </div>
+
+    <div id="modal" class="screen hidden" style="background:rgba(0,0,0,0.6);">
+        <div style="background:white; padding:25px; border-radius:20px; width:85%; max-width:350px;">
             <h3 id="m-title" style="color:var(--accent);">Memory</h3>
             <p id="m-q" style="font-weight:bold;"></p>
-            <textarea id="m-ans" placeholder="Your answer is the key to this memory..."></textarea>
-            <div style="display:flex; gap:10px; justify-content:center;">
-                <button onclick="closeModal()" style="background:#eee; border:none; padding:10px 20px; border-radius:10px;">Not yet</button>
-                <button onclick="saveMemory()" style="background:var(--accent); color:white; border:none; padding:10px 20px; border-radius:10px; cursor:pointer; font-weight:bold;">Unlock Memory</button>
-            </div>
+            <textarea id="m-ans" style="width:100%; height:80px; margin-bottom:15px; padding:10px; border-radius:10px; border:2px solid #ddd;" placeholder="Type here..."></textarea>
+            <button onclick="saveMemory()" style="background:var(--accent); color:white; padding:10px 20px; border:none; border-radius:10px; font-weight:bold;">Unlock Memory</button>
         </div>
     </div>
 
     <script>
         const ROOMS = [
             { name: "The Foundation", theme: "t1", icons: ["💌", "🌸", "☕"], questions: ["What was the very first thought you had when we met?", "What small habit of mine made you realize we were becoming close?", "What is a 'foundation' memory that makes you feel safe with us?"] },
-            { name: "The Spark", theme: "t2", icons: ["💫", "🌙", "🎵"], questions: ["Recall the moment the 'spark' turned into a fire. Where were we?", "What song instantly takes you back to our earliest, most exciting days?", "What was the most 'magical' date we've ever been on?"] },
-            { name: "Distance", theme: "t3", icons: ["📱", "✈️", "💝"], questions: ["What was the hardest part of being apart, and how did we fix it?", "Describe the feeling of seeing me for the first time after a long time away.", "What is a 'distance' lesson that made our bond stronger?"] },
-            { name: "Growing", theme: "t4", icons: ["🌱", "🌈", "🤝"], questions: ["What is a challenge we overcame that you're most proud of?", "How have I helped you grow into the person you are today?", "What is a compromise we made that actually made life better?"] },
-            { name: "Forever", theme: "t5", icons: ["🏡", "🔮", "💍"], questions: ["If we could build our dream life anywhere, what does it look like?", "What is one promise you want to keep to me for the rest of our lives?", "What are you most excited to experience with me in 10 years?"] }
+            { name: "The Spark", theme: "t2", icons: ["💫", "🌙", "🎵"], questions: ["Recall the moment the 'spark' turned into a fire. Where were we?", "What song instantly takes you back to our earliest days?", "What was the most 'magical' date we've ever been on?"] },
+            { name: "Distance", theme: "t3", icons: ["📱", "✈️", "💝"], questions: ["What was the hardest part of being apart, and how did we fix it?", "Describe seeing me for the first time after a long time away.", "What is a 'distance' lesson that made us stronger?"] },
+            { name: "Growing", theme: "t4", icons: ["🌱", "🌈", "🤝"], questions: ["What challenge we overcame are you most proud of?", "How have I helped you grow into the person you are today?", "What compromise made our life better?"] },
+            { name: "Forever", theme: "t5", icons: ["🏡", "🔮", "💍"], questions: ["What does our dream life look like in 10 years?", "What promise do you want to keep to me forever?", "What is the next big adventure you want to go on?"] }
         ];
 
-        let state = { room: 0, unlocked: [], kisses: 0, hat: 'hat-p1', fname: '', lname: '' };
-        let pedestals = [];
+        let state = { room: 0, unlocked: [], kisses: 0, hat: 'hat-p1', dress: 'dress-1', fname: '', lname: '' };
         let activeItem = null;
 
-        function toCreator() { 
-            document.getElementById('screen-intro').classList.add('hidden'); 
-            document.getElementById('screen-creator').classList.remove('hidden'); 
-        }
-
-        function setHat(h) { 
-            state.hat = h; 
-            document.getElementById('preview-hat').className = 'c-hat ' + h; 
-        }
+        function setHat(h) { state.hat = h; document.getElementById('p-hat').className = 'c-hat ' + h; }
+        function setDress(d) { state.dress = d; document.getElementById('p-body').className = 'c-body ' + d; }
 
         function startGame() {
-            state.fname = document.getElementById('fname').value;
-            state.lname = document.getElementById('lname').value;
-            if(!state.fname || !state.lname) return alert("Both names are required for the visitor log!");
-            
+            state.fname = document.getElementById('fname').value.trim();
+            state.lname = document.getElementById('lname').value.trim();
+            if(!state.fname || !state.lname) return alert("Sign the guestbook!");
+            if(state.fname.toLowerCase() === 'amena' && state.lname.toLowerCase() === 'farooq') state.kisses += 10;
             document.getElementById('screen-creator').classList.add('hidden');
             document.getElementById('game-world').classList.remove('hidden');
             document.getElementById('g-hat').className = 'c-hat ' + state.hat;
+            document.getElementById('g-body').className = 'c-body ' + state.dress;
             loadRoom();
         }
 
@@ -218,108 +189,74 @@
             document.getElementById('room-wall').className = 'wall ' + r.theme + '-wall';
             document.getElementById('room-floor').className = 'floor ' + r.theme + '-floor';
             document.getElementById('room-name').innerText = r.name;
-            
             const layer = document.getElementById('artifacts-layer');
             layer.innerHTML = '';
-            pedestals = [];
-            
-            const pos = [{x:20, y:30}, {x:50, y:70}, {x:80, y:30}];
-            
+            const pos = [{x:25, y:35}, {x:50, y:70}, {x:75, y:35}];
             r.icons.forEach((icon, i) => {
                 const id = `${state.room}-${i}`;
                 const unlocked = state.unlocked.includes(id);
-                const group = document.createElement('div');
-                group.id = "pedestal-" + id;
-                group.className = 'pedestal-group ' + (unlocked ? 'unlocked' : '');
-                group.style.left = pos[i].x + '%';
-                group.style.top = pos[i].y + '%';
-                group.style.zIndex = Math.floor(pos[i].y);
-                
-                group.innerHTML = `
-                    <div class="proximity-circle"></div>
-                    <div class="artifact-item">${icon}</div>
-                    <div class="pedestal"></div>
-                `;
-
-                group.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    handleArtifactClick(pos[i], id, r.questions[i], icon);
-                });
-
-                layer.appendChild(group);
-                pedestals.push({pos: pos[i], id: id, q: r.questions[i], icon: icon});
+                const g = document.createElement('div');
+                g.className = 'pedestal-group ' + (unlocked ? 'unlocked' : '');
+                g.style.left = pos[i].x + '%'; g.style.top = pos[i].y + '%';
+                g.innerHTML = `<div class="proximity-circle"></div><div class="artifact-item">${icon}</div><div class="pedestal"></div>`;
+                g.onclick = (e) => { e.stopPropagation(); handleArtifactClick(pos[i], id, r.questions[i], icon); };
+                layer.appendChild(g);
             });
             updateHUD();
         }
 
         function handleFloorClick(e) {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-            movePlayer(x, y);
+            const rect = document.getElementById('room-floor').getBoundingClientRect();
+            movePlayer(((e.clientX - rect.left) / rect.width) * 100, ((e.clientY - rect.top) / rect.height) * 100);
+        }
+
+        function movePlayer(x, y) {
+            const p = document.getElementById('player');
+            if (x < parseFloat(p.style.left || 50)) p.classList.add('flip'); else p.classList.remove('flip');
+            p.style.left = x + '%'; p.style.top = y + '%';
+            p.classList.add('walking');
+            setTimeout(() => { p.classList.remove('walking'); updateProximity(x, y); }, 800);
+        }
+
+        function updateProximity(px, py) {
+            const r = ROOMS[state.room];
+            const pos = [{x:25, y:35}, {x:50, y:70}, {x:75, y:35}];
+            document.querySelectorAll('.pedestal-group').forEach((el, i) => {
+                const d = Math.sqrt(Math.pow(px - pos[i].x, 2) + Math.pow(py - pos[i].y, 2));
+                if (d < 22) el.classList.add('near-player'); else el.classList.remove('near-player');
+            });
         }
 
         function handleArtifactClick(pos, id, q, name) {
             movePlayer(pos.x, pos.y + 5); 
             setTimeout(() => {
-                const player = document.getElementById('player');
-                const px = parseFloat(player.style.left);
-                const py = parseFloat(player.style.top);
-                const dist = Math.sqrt(Math.pow(px - pos.x, 2) + Math.pow(py - pos.y, 2));
-
-                if (dist < 22) {
-                    if(state.unlocked.includes(id)) return;
-                    activeItem = {id, q, name};
-                    document.getElementById('m-title').innerText = name;
-                    document.getElementById('m-q').innerText = q;
-                    document.getElementById('modal').classList.remove('hidden');
-                }
+                if(state.unlocked.includes(id)) return;
+                activeItem = {id, q, name, pos};
+                document.getElementById('m-title').innerText = name;
+                document.getElementById('m-q').innerText = q;
+                document.getElementById('modal').classList.remove('hidden');
             }, 850);
         }
 
-        function movePlayer(x, y) {
-            const player = document.getElementById('player');
-            const currentX = parseFloat(player.style.left) || 50;
-            
-            // Flip character
-            if (x < currentX) player.classList.add('flip');
-            else player.classList.remove('flip');
-
-            player.style.left = x + '%';
-            player.style.top = y + '%';
-            player.style.zIndex = Math.floor(y);
-            player.classList.add('walking');
-            
-            const interval = setInterval(() => updateProximity(x, y), 50);
-            setTimeout(() => {
-                player.classList.remove('walking');
-                clearInterval(interval);
-                updateProximity(x, y);
-            }, 800);
-        }
-
-        function updateProximity(px, py) {
-            pedestals.forEach(p => {
-                const dist = Math.sqrt(Math.pow(px - p.pos.x, 2) + Math.pow(py - p.pos.y, 2));
-                const el = document.getElementById("pedestal-" + p.id);
-                if (dist < 20) el.classList.add('near-player');
-                else el.classList.remove('near-player');
-            });
-        }
-
-        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
-
         function saveMemory() {
             if(!document.getElementById('m-ans').value) return;
-            state.unlocked.push(activeItem.id);
-            state.kisses++;
+            state.unlocked.push(activeItem.id); state.kisses++;
+            createParticles(activeItem.pos.x, activeItem.pos.y);
             document.getElementById('modal').classList.add('hidden');
             document.getElementById('m-ans').value = '';
             loadRoom();
-            
-            const roomIds = [0,1,2].map(i => `${state.room}-${i}`);
-            if(roomIds.every(id => state.unlocked.includes(id))) {
-                document.getElementById('btn-next').style.display = 'block';
+            if ([0,1,2].every(i => state.unlocked.includes(`${state.room}-${i}`))) document.getElementById('btn-next').style.display = 'block';
+        }
+
+        function createParticles(x, y) {
+            for(let i=0; i<8; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle'; p.innerText = '❤️';
+                p.style.left = x + '%'; p.style.top = y + '%';
+                p.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
+                p.style.setProperty('--ty', (Math.random() * -150 - 50) + 'px');
+                document.getElementById('room-floor').appendChild(p);
+                setTimeout(() => p.remove(), 1000);
             }
         }
 
@@ -327,17 +264,22 @@
             state.room++;
             if(state.room >= ROOMS.length) {
                 document.getElementById('game-world').classList.add('hidden');
-                document.getElementById('screen-finale').classList.remove('hidden');
-                document.getElementById('finale-name').innerText = state.fname + " " + state.lname;
-                document.getElementById('final-kisses').innerText = state.kisses;
+                document.getElementById('screen-proposal').classList.remove('hidden');
             } else {
                 document.getElementById('btn-next').style.display = 'none';
                 loadRoom();
             }
         }
 
+        function showFinale() {
+            if(!document.getElementById('money-agree').checked) return alert("You must agree to send the Dedso Rupiya!");
+            document.getElementById('screen-proposal').classList.add('hidden');
+            document.getElementById('screen-finale').classList.remove('hidden');
+            document.getElementById('final-name').innerText = state.fname + " " + state.lname;
+            document.getElementById('final-kisses').innerText = state.kisses;
+        }
+
         function updateHUD() { document.getElementById('kisses').innerText = state.kisses; }
-        function toggleMusic() { alert("🎵 Switched to chill museum lo-fi..."); }
     </script>
 </body>
 </html>
