@@ -1,222 +1,707 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Museum of Us</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Museum of Us</title>
+    <style>
+        :root {
+            --p-pink: #ffafbd;
+            --p-rose: #ffc3a0;
+            --p-accent: #ff4b2b;
+            --p-gold: #ffd700;
+            --bg-soft: #fff5f7;
+            --ui-font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
-<style>
-* { box-sizing: border-box; font-family: system-ui, -apple-system; }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-body {
-  margin: 0;
-  background: #fdecef;
-  overflow: hidden;
-}
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg-soft);
+            font-family: var(--ui-font);
+        }
 
-.screen {
-  display: none;
-  width: 100vw;
-  height: 100vh;
-  padding: 20px;
-}
+        /* --- UI Screens --- */
+        .screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            z-index: 100;
+            background: white;
+            transition: opacity 0.5s ease;
+        }
 
-.active { display: block; }
+        #setup-screen { background: linear-gradient(to bottom, var(--p-pink), var(--p-rose)); }
+        
+        .hidden { display: none !important; opacity: 0; pointer-events: none; }
 
-h2 { text-align: center; }
+        /* --- Character Setup UI --- */
+        .setup-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 90%; max-width: 400px;
+        }
 
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 20px;
-  background: #ff6f91;
-  color: white;
-  font-size: 16px;
-}
+        .hat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
 
-input, textarea {
-  width: 100%;
-  padding: 10px;
-  border-radius: 12px;
-  border: 1px solid #ccc;
-  margin-top: 8px;
-}
+        .hat-option {
+            width: 60px; height: 60px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
 
-.room {
-  background: linear-gradient(#ffe3ea, #fff);
-  border-radius: 20px;
-  height: calc(100% - 80px);
-  padding: 20px;
-  position: relative;
-}
+        .hat-option.selected { border-color: var(--p-accent); }
 
-.artifacts {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-top: 20px;
-}
+        /* Hat Patterns */
+        .hat-yellow { background: yellow; }
+        .hat-yellow::after { content: ''; position: absolute; width: 100%; height: 100%; background-image: radial-gradient(red 20%, transparent 20%); background-size: 10px 10px; }
+        .hat-red { background: red; }
+        .hat-red::after { content: '🌸'; font-size: 10px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: space-around; }
+        .hat-blue { background: blue; }
+        .hat-blue::after { content: '⭐'; color: gold; font-size: 10px; position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-wrap: wrap; justify-content: space-around; }
+        .hat-green { background: green; }
+        .hat-green::after { content: ''; position: absolute; width: 100%; height: 100%; background: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.3) 5px, rgba(255,255,255,0.3) 10px); }
 
-.artifact {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  text-align: center;
-  font-size: 30px;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,.1);
-}
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            outline: none;
+        }
 
-.character {
-  position: absolute;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 40px;
-}
+        button {
+            background: var(--p-accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
 
-.nav {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-}
+        button:active { transform: scale(0.95); }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.4);
-  display: none;
-  justify-content: center;
-  align-items: center;
-}
+        /* --- Game World --- */
+        #game-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #eee;
+            touch-action: none;
+        }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 20px;
-  width: 90%;
-  max-width: 400px;
-}
+        #header-ui {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 15px;
+            display: flex; justify-content: space-between;
+            z-index: 50;
+            pointer-events: none;
+        }
 
-.coupon {
-  background: repeating-linear-gradient(
-    45deg,
-    #fff,
-    #fff 10px,
-    #ffe3ea 10px,
-    #ffe3ea 20px
-  );
-  border-radius: 20px;
-  padding: 30px;
-  text-align: center;
-}
-</style>
+        .ui-box {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            pointer-events: auto;
+        }
+
+        #map {
+            width: 800px;
+            height: 800px;
+            position: absolute;
+            transition: background 0.5s;
+        }
+
+        /* --- Character Avatar --- */
+        #player {
+            width: 50px;
+            height: 60px;
+            position: absolute;
+            z-index: 10;
+            transition: transform 0.1s linear;
+        }
+
+        .chibi-body {
+            width: 30px; height: 35px;
+            background: #ffccff; /* Default dress color */
+            border-radius: 15px 15px 5px 5px;
+            margin: 0 auto;
+            position: relative;
+            top: 20px;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.1);
+        }
+
+        .chibi-head {
+            width: 34px; height: 34px;
+            background: #ffe0bd;
+            border-radius: 50%;
+            position: absolute;
+            top: -10px; left: -2px;
+        }
+
+        .chibi-face {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 12px;
+        }
+
+        .eye { width: 4px; height: 4px; background: #333; border-radius: 50%; }
+        .smile { width: 10px; height: 5px; border-bottom: 2px solid #333; border-radius: 50%; margin: 2px auto; }
+
+        .chibi-hat {
+            width: 44px; height: 15px;
+            border-radius: 20px 20px 5px 5px;
+            position: absolute;
+            top: -15px; left: -7px;
+        }
+        .chibi-hat::before { /* Brim */
+            content: '';
+            position: absolute;
+            bottom: -3px; left: -10%;
+            width: 120%; height: 5px;
+            background: inherit;
+            border-radius: 50%;
+        }
+
+        /* --- Artifacts --- */
+        .artifact {
+            position: absolute;
+            width: 60px; height: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pedestal {
+            width: 40px; height: 20px;
+            background: #ddd;
+            border-top: 4px solid #fff;
+            position: absolute;
+            bottom: 0;
+            border-radius: 4px;
+        }
+
+        .item-visual {
+            font-size: 30px;
+            filter: drop-shadow(0 0 5px rgba(0,0,0,0.2));
+            transition: 0.3s;
+        }
+
+        .unlocked .item-visual {
+            filter: drop-shadow(0 0 10px var(--p-gold));
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from { transform: scale(1); filter: drop-shadow(0 0 5px var(--p-gold)); }
+            to { transform: scale(1.1); filter: drop-shadow(0 0 15px gold); }
+        }
+
+        .interaction-circle {
+            position: absolute;
+            width: 100px; height: 100px;
+            border: 2px dashed rgba(255,255,255,0.4);
+            border-radius: 50%;
+            top: -10px; left: -20px;
+            pointer-events: none;
+            display: none;
+        }
+
+        .near .interaction-circle { display: block; }
+
+        /* --- Modal --- */
+        #modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+
+        .modal {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        /* --- Controls --- */
+        #controls {
+            position: fixed;
+            bottom: 20px; left: 20px;
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            gap: 10px;
+            z-index: 50;
+        }
+
+        .btn-ctrl {
+            width: 50px; height: 50px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 20px;
+        }
+
+        #next-room-btn {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            display: none;
+            background: #4CAF50;
+            z-index: 50;
+        }
+
+        /* --- Confetti --- */
+        .confetti {
+            position: fixed;
+            width: 10px; height: 10px;
+            background: red;
+            z-index: 999;
+            pointer-events: none;
+        }
+
+        /* --- Final Screen --- */
+        #final-screen {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+
+        .coupon {
+            border: 5px dashed white;
+            padding: 20px;
+            margin: 20px 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 10px;
+        }
+
+        #answer-log {
+            text-align: left;
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255,255,255,0.5);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+    </style>
 </head>
+<body oncontextmenu="return false">
 
-<body>
+    <div id="setup-screen" class="screen">
+        <div class="setup-card">
+            <h1>Museum of Us</h1>
+            <p>Enter your details to begin the journey</p>
+            <input type="text" id="fname" placeholder="First Name">
+            <input type="text" id="lname" placeholder="Last Name">
+            
+            <p>Pick a Sun Hat:</p>
+            <div class="hat-grid">
+                <div class="hat-option hat-yellow selected" onclick="selectHat('yellow', this)"></div>
+                <div class="hat-option hat-red" onclick="selectHat('red', this)"></div>
+                <div class="hat-option hat-blue" onclick="selectHat('blue', this)"></div>
+                <div class="hat-option hat-green" onclick="selectHat('green', this)"></div>
+            </div>
 
-<audio id="bgm" loop>
-  <source src="music.mp3.mp3" type="audio/mpeg">
-</audio>
-
-<!-- SETUP -->
-<div id="setup" class="screen active">
-  <h2>Museum of Us</h2>
-  <input id="fname" placeholder="First name">
-  <input id="lname" placeholder="Last name">
-  <br><br>
-  <button onclick="start()">Enter</button>
-</div>
-
-<!-- ROOMS -->
-<div id="room1" class="screen room-screen"></div>
-<div id="room2" class="screen room-screen"></div>
-<div id="room3" class="screen room-screen"></div>
-<div id="room4" class="screen room-screen"></div>
-<div id="room5" class="screen room-screen"></div>
-
-<!-- MODAL -->
-<div id="modal" class="modal">
-  <div class="modal-content">
-    <p id="qtext"></p>
-    <textarea id="answer"></textarea>
-    <br><br>
-    <button onclick="saveAnswer()">Save</button>
-  </div>
-</div>
-
-<script>
-let fname = '', lname = '';
-let currentQ = '';
-
-const questions = Array.from({length:15}, (_,i)=>`Question ${i+1}: Write anything you feel 💕`);
-
-function start() {
-  fname = fnameInput.value.trim();
-  lname = lnameInput.value.trim();
-  document.getElementById('bgm').play();
-  showRoom(1);
-}
-
-function showRoom(n) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('room'+n).classList.add('active');
-  renderRoom(n);
-}
-
-function renderRoom(n) {
-  const room = document.getElementById('room'+n);
-  room.innerHTML = `
-    <h2>Room ${n}</h2>
-    <div class="room">
-      <div class="artifacts">
-        ${[0,1,2].map(i=>{
-          const q = (n-1)*3+i;
-          return `<div class="artifact" onclick="openQ(${q})">💖</div>`;
-        }).join('')}
-      </div>
-      <div class="character">👒😊</div>
-      <div class="nav">
-        ${n<5?`<button onclick="showRoom(${n+1})">Next</button>`:''}
-      </div>
+            <button onclick="startGame()">Enter Museum</button>
+        </div>
     </div>
-  `;
-  if(n===5) renderFinal(room);
-}
 
-function openQ(i){
-  currentQ=i;
-  qtext.innerText=questions[i];
-  answer.value=localStorage.getItem('q'+i)||'';
-  modal.style.display='flex';
-}
+    <div id="game-screen" class="screen hidden">
+        <div id="header-ui">
+            <div class="ui-box" id="room-name">The Foundation</div>
+            <div class="ui-box" id="kiss-counter">💋 0 Kisses</div>
+            <div class="ui-box" onclick="toggleMusic()" style="cursor:pointer">🎵 <span id="m-status">OFF</span></div>
+        </div>
 
-function saveAnswer(){
-  localStorage.setItem('q'+currentQ, answer.value);
-  modal.style.display='none';
-}
+        <div id="game-container">
+            <div id="map">
+                <div id="player">
+                    <div class="chibi-hat" id="p-hat"></div>
+                    <div class="chibi-body">
+                        <div class="chibi-head">
+                            <div class="chibi-face">
+                                <div class="eye"></div>
+                                <div class="eye"></div>
+                            </div>
+                            <div class="smile"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="artifact-layer"></div>
+            </div>
+        </div>
 
-function renderFinal(room){
-  room.innerHTML=`
-    <h2>Final Room</h2>
-    <div class="coupon">
-      <p>Will you be my Valentine?</p>
-      <label><input type="checkbox" id="agree"> I agree to send Dedso rupiya</label>
-      <br><br>
-      <button onclick="coupon()">Get Coupon</button>
-      <p id="result"></p>
+        <div id="controls">
+            <div></div><div class="btn-ctrl" ontouchstart="move('up')">↑</div><div></div>
+            <div class="btn-ctrl" ontouchstart="move('left')">←</div><div class="btn-ctrl" ontouchstart="move('down')">↓</div><div class="btn-ctrl" ontouchstart="move('right')">→</div>
+        </div>
+
+        <button id="next-room-btn" onclick="nextRoom()">Move to Next Room →</button>
     </div>
-  `;
-}
 
-function coupon(){
-  if(!agree.checked){alert('Checkbox required');return;}
-  let kisses=0;
-  for(let i=0;i<15;i++) if(localStorage.getItem('q'+i)) kisses++;
-  if(fname.toLowerCase()==='amena' && lname.toLowerCase()==='farooq') kisses+=10;
-  result.innerHTML=`💋 This coupon is valid for <strong>${kisses}</strong> kisses 💋`;
-}
-</script>
+    <div id="modal-overlay">
+        <div class="modal">
+            <h3 id="modal-title">Artifact Question</h3>
+            <p id="modal-question"></p>
+            <input type="text" id="answer-input" placeholder="Type your response...">
+            <button onclick="submitAnswer()">Unlock Artifact</button>
+        </div>
+    </div>
 
+    <div id="final-screen" class="screen hidden">
+        <h1 id="valentine-text">Will you be my Valentine?</h1>
+        <div class="coupon">
+            <h2 id="final-kiss-count">X Kisses</h2>
+            <p>This coupon is valid for a lifetime of love.</p>
+        </div>
+        
+        <label style="margin: 20px 0; display: block; cursor:pointer;">
+            <input type="checkbox" id="agree-check"> I agree to send Dedso rupiya
+        </label>
+
+        <button id="submit-valentine" onclick="finishGame()">Yes, I Accept!</button>
+
+        <h3>Our Memories</h3>
+        <div id="answer-log"></div>
+    </div>
+
+    <script>
+        // --- GAME DATA ---
+        const rooms = [
+            { 
+                name: "Room 1: The Foundation", 
+                floor: "radial-gradient(circle, #fdfcfb 0%, #e2d1c3 100%)",
+                items: [
+                    { id: 0, icon: "💌", name: "Message in a Bottle", q: "What's a memory from our friendship that still makes you smile?" },
+                    { id: 1, icon: "🌸", name: "Early Petals", q: "When did you first suspect we might be more than friends?" },
+                    { id: 2, icon: "☕", name: "First Coffee", q: "What quality did you admire in me before we started dating?" }
+                ]
+            },
+            { 
+                name: "Room 2: The Spark", 
+                floor: "repeating-conic-gradient(#ffecd2 0% 25%, #fcb69f 0% 50%) 50% / 100px 100px",
+                items: [
+                    { id: 3, icon: "💫", name: "Confession Night", q: "What moment from our early days feels like pure magic?" },
+                    { id: 4, icon: "🌙", name: "New Beginnings", q: "When did you realize this wasn't just a fleeting feeling?" },
+                    { id: 5, icon: "🎵", name: "Our First Song", q: "What's something small from our first dates you treasure?" }
+                ]
+            },
+            { 
+                name: "Room 3: Distance & Love", 
+                floor: "linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)",
+                items: [
+                    { id: 6, icon: "📱", name: "Late Night Calls", q: "What helped you feel my presence most when we were miles apart?" },
+                    { id: 7, icon: "✈️", name: "Miles Apart", q: "How did our time apart change the way you think about 'home'?" },
+                    { id: 8, icon: "💝", name: "Waiting Heart", q: "What did you learn about our love during the hardest separation?" }
+                ]
+            },
+            { 
+                name: "Room 4: Growing Together", 
+                floor: "radial-gradient(circle, #d4fc79 0%, #96e6a1 100%)",
+                items: [
+                    { id: 9, icon: "🌱", name: "Lessons Learned", q: "What have our disagreements taught you about compromise?" },
+                    { id: 10, icon: "🌈", name: "After the Storm", q: "How do you feel when we find our way back after a difficult moment?" },
+                    { id: 11, icon: "🤝", name: "Understanding", q: "What's something you've grown to love that once frustrated you?" }
+                ]
+            },
+            { 
+                name: "Room 5: Forever & Always", 
+                floor: "linear-gradient(to top, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)",
+                items: [
+                    { id: 12, icon: "🏡", name: "Future Home", q: "What dream of yours feels incomplete without me in it?" },
+                    { id: 13, icon: "🔮", name: "Our Dreams", q: "What are you most excited to build together as we move forward?" },
+                    { id: 14, icon: "💍", name: "Forever", q: "What does 'forever' look like through your eyes?" }
+                ]
+            }
+        ];
+
+        let state = {
+            roomIndex: 0,
+            x: 400, y: 400,
+            kisses: 0,
+            unlockedInRoom: [],
+            allAnswers: {},
+            hat: 'yellow',
+            user: { f: '', l: '' },
+            music: false
+        };
+
+        const playerEl = document.getElementById('player');
+        const mapEl = document.getElementById('map');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let osc;
+
+        // --- CORE FUNCTIONS ---
+
+        function selectHat(color, el) {
+            state.hat = color;
+            document.querySelectorAll('.hat-option').forEach(opt => opt.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('p-hat').className = 'chibi-hat hat-' + color;
+        }
+
+        function startGame() {
+            state.user.f = document.getElementById('fname').value.trim();
+            state.user.l = document.getElementById('lname').value.trim();
+            if (!state.user.f || !state.user.l) return alert("Please enter your name!");
+
+            // Secret Bonus
+            if (state.user.f.toLowerCase() === 'amena' && state.user.l.toLowerCase() === 'farooq') {
+                state.kisses += 10;
+                updateKisses();
+            }
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            loadRoom(0);
+            updatePlayer();
+        }
+
+        function loadRoom(idx) {
+            state.roomIndex = idx;
+            state.unlockedInRoom = [];
+            const room = rooms[idx];
+            document.getElementById('room-name').innerText = room.name;
+            mapEl.style.background = room.floor;
+            document.getElementById('next-room-btn').style.display = 'none';
+
+            // Generate Artifacts
+            const layer = document.getElementById('artifact-layer');
+            layer.innerHTML = '';
+            
+            const positions = [{x:200, y:200}, {x:500, y:300}, {x:300, y:600}];
+            room.items.forEach((item, i) => {
+                const art = document.createElement('div');
+                art.className = 'artifact';
+                art.id = 'art-' + item.id;
+                art.style.left = positions[i].x + 'px';
+                art.style.top = positions[i].y + 'px';
+                art.innerHTML = `
+                    <div class="interaction-circle"></div>
+                    <div class="item-visual">${item.icon}</div>
+                    <div class="pedestal"></div>
+                `;
+                art.dataset.qid = item.id;
+                layer.appendChild(art);
+            });
+            
+            // Center player
+            state.x = 400; state.y = 400;
+            updatePlayer();
+        }
+
+        function updatePlayer() {
+            playerEl.style.left = state.x + 'px';
+            playerEl.style.top = state.y + 'px';
+            
+            // Boundary checks
+            if (state.x < 50) state.x = 50; if (state.x > 750) state.x = 750;
+            if (state.y < 50) state.y = 50; if (state.y > 750) state.y = 750;
+
+            // Proximity Check
+            const artifacts = document.querySelectorAll('.artifact');
+            artifacts.forEach(art => {
+                const ax = parseInt(art.style.left);
+                const ay = parseInt(art.style.top);
+                const dist = Math.sqrt((state.x - ax)**2 + (state.y - ay)**2);
+                
+                if (dist < 70) {
+                    art.classList.add('near');
+                    currentNearArtifact = art;
+                } else {
+                    art.classList.remove('near');
+                }
+            });
+        }
+
+        let currentNearArtifact = null;
+
+        function move(dir) {
+            const step = 20;
+            if (dir === 'up') state.y -= step;
+            if (dir === 'down') state.y += step;
+            if (dir === 'left') { state.x -= step; playerEl.style.transform = 'scaleX(1)'; }
+            if (dir === 'right') { state.x += step; playerEl.style.transform = 'scaleX(-1)'; }
+            updatePlayer();
+        }
+
+        // Keyboard support
+        window.addEventListener('keydown', (e) => {
+            if (document.getElementById('modal-overlay').style.display === 'flex') {
+                if (e.key === 'Escape') closeModal();
+                if (e.key === 'Enter') submitAnswer();
+                return;
+            }
+            if (e.key === 'ArrowUp' || e.key === 'w') move('up');
+            if (e.key === 'ArrowDown' || e.key === 's') move('down');
+            if (e.key === 'ArrowLeft' || e.key === 'a') move('left');
+            if (e.key === 'ArrowRight' || e.key === 'd') move('right');
+            if (e.key === 'e' || e.key === ' ') interact();
+        });
+
+        function interact() {
+            if (currentNearArtifact && currentNearArtifact.classList.contains('near')) {
+                const qid = currentNearArtifact.dataset.qid;
+                const item = rooms.flatMap(r => r.items).find(i => i.id == qid);
+                
+                document.getElementById('modal-title').innerText = item.name;
+                document.getElementById('modal-question').innerText = item.q;
+                document.getElementById('answer-input').value = '';
+                document.getElementById('modal-overlay').style.display = 'flex';
+                document.getElementById('answer-input').focus();
+            }
+        }
+
+        // Tap on artifact also works for mobile
+        mapEl.addEventListener('click', (e) => {
+            if (e.target.closest('.artifact')) {
+                interact();
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('modal-overlay').style.display = 'none';
+        }
+
+        function submitAnswer() {
+            const ans = document.getElementById('answer-input').value.trim();
+            if (!ans) return alert("Please share a thought!");
+
+            const qid = currentNearArtifact.dataset.qid;
+            state.allAnswers[qid] = ans;
+            
+            if (!state.unlockedInRoom.includes(qid)) {
+                state.unlockedInRoom.push(qid);
+                state.kisses++;
+                updateKisses();
+                currentNearArtifact.classList.add('unlocked');
+                createConfetti();
+            }
+
+            closeModal();
+
+            if (state.unlockedInRoom.length === 3) {
+                document.getElementById('next-room-btn').style.display = 'block';
+            }
+        }
+
+        function updateKisses() {
+            document.getElementById('kiss-counter').innerText = `💋 ${state.kisses} Kisses`;
+        }
+
+        function nextRoom() {
+            if (state.roomIndex < 4) {
+                loadRoom(state.roomIndex + 1);
+            } else {
+                showFinal();
+            }
+        }
+
+        function showFinal() {
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('final-screen').classList.remove('hidden');
+            document.getElementById('final-kiss-count').innerText = `${state.kisses} Kisses Earned`;
+            
+            const log = document.getElementById('answer-log');
+            log.innerHTML = '';
+            rooms.forEach((room, rIdx) => {
+                log.innerHTML += `<h4>${room.name}</h4>`;
+                room.items.forEach(item => {
+                    log.innerHTML += `<p><b>Q:</b> ${item.q}<br><b>A:</b> ${state.allAnswers[item.id]}</p>`;
+                });
+            });
+        }
+
+        function finishGame() {
+            if (!document.getElementById('agree-check').checked) {
+                alert("You must agree to send Dedso rupiya!");
+                return;
+            }
+            createConfetti();
+            alert("Happy Valentine's Day! ❤️ Screenshot your coupon!");
+        }
+
+        // --- EXTRAS ---
+
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                const c = document.createElement('div');
+                c.className = 'confetti';
+                c.style.left = Math.random() * 100 + 'vw';
+                c.style.top = '-10px';
+                c.style.backgroundColor = ['#ff4b2b', '#ffd700', '#ffc3a0', '#ffafbd'][Math.floor(Math.random()*4)];
+                document.body.appendChild(c);
+                
+                const anim = c.animate([
+                    { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                    { transform: `translateY(100vh) rotate(${Math.random()*360}deg)`, opacity: 0 }
+                ], { duration: 2000 + Math.random()*1000 });
+                anim.onfinish = () => c.remove();
+            }
+        }
+
+        function toggleMusic() {
+            state.music = !state.music;
+            document.getElementById('m-status').innerText = state.music ? "ON" : "OFF";
+            if (state.music) {
+                playSimpleTune();
+            } else {
+                if (osc) osc.stop();
+            }
+        }
+
+        function playSimpleTune() {
+            if (!state.music) return;
+            osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.value = 0.05;
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(261.63, audioCtx.currentTime); // C4
+            osc.start();
+        }
+
+        // Prevent iOS bounce
+        document.addEventListener('touchmove', (e) => {
+            if (e.target.id === 'final-screen' || e.target.closest('#final-screen')) return;
+            e.preventDefault();
+        }, { passive: false });
+
+    </script>
 </body>
 </html>
+
