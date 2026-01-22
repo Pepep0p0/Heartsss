@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Museum of Us</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=Pacifico&family=Cinzel:wght@700&display=swap" rel="stylesheet">
     <style>
-        :root { --bg: #fdf6e3; --accent: #ff7043; --pink: #ff8a80; --gold: #ffd700; }
+        :root { --bg: #fdf6e3; --accent: #ff7043; --pink: #ff8a80; --gold: #ffd700; --wood: #5d4037; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Nunito', sans-serif; background: #2c3e50; overflow: hidden; touch-action: none; }
 
@@ -22,33 +22,91 @@
         .c-eye { width: 8px; height: 10px; background: #3e2723; border-radius: 50%; position: absolute; }
         .c-eye.left { left: 5px; } .c-eye.right { right: 5px; }
         .c-mouth { width: 10px; height: 5px; border-bottom: 2px solid #3e2723; border-radius: 0 0 10px 10px; position: absolute; bottom: -8px; left: 15px; }
-        .c-body { width: 36px; height: 40px; background: #ff7043; position: absolute; top: 50px; left: 12px; border-radius: 15px 15px 5px 5px; z-index: 9; }
-        .c-hat { width: 80px; height: 40px; position: absolute; top: -15px; left: -10px; z-index: 12; border-radius: 40px 40px 0 0; }
-        .c-hat::after { content: ''; position: absolute; bottom: 0; left: -5px; width: 90px; height: 10px; background: inherit; border-radius: 20px; }
+        .c-body { position: absolute; top: 50px; left: 12px; z-index: 9; }
 
-        /* Styles */
-        .hat-p1 { background: radial-gradient(#d32f2f 20%, transparent 20%), #fdd835; background-size: 10px 10px; }
-        .hat-p2 { background: radial-gradient(#fff 15%, transparent 16%), #e53935; background-size: 15px 15px; }
-        .hat-p3 { background: conic-gradient(from 45deg, #1a237e 25%, #3949ab 25% 50%, #1a237e 50% 75%, #3949ab 75%); background-size: 10px 10px; }
-        .dress-1 { background: #ff7043; } .dress-2 { background: #9c27b0; } .dress-3 { background: #2196f3; } .dress-4 { background: #4caf50; }
+        /* OUTFIT & HATS */
+        .outfit-dress { width: 36px; height: 40px; background: #ff7043; border-radius: 15px 15px 5px 5px; clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%); }
+        .outfit-jeans { width: 36px; height: 40px; background: linear-gradient(to bottom, #ffffff 50%, #1565c0 50%); border-radius: 10px; }
+        .outfit-jeans::after { content: ''; position: absolute; bottom: 0; left: 17px; width: 2px; height: 18px; background: rgba(0,0,0,0.2); }
+        .outfit-overall { width: 38px; height: 40px; background: #5c6bc0; border-radius: 8px; border-top: 5px solid white; }
+        .outfit-hoodie { width: 42px; height: 38px; left: 9px; background: #66bb6a; border-radius: 15px 15px 10px 10px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1); }
+
+        .c-hat { position: absolute; z-index: 12; }
+        .hat-beanie { width: 60px; height: 35px; top: -10px; left: 0; background: #d32f2f; border-radius: 30px 30px 0 0; }
+        .hat-broad { width: 50px; height: 25px; top: -15px; left: 5px; background: #fdd835; border-radius: 20px 20px 0 0; }
+        .hat-broad::after { content: ''; position: absolute; bottom: 0; left: -20px; width: 90px; height: 8px; background: #fbc02d; border-radius: 10px; }
+        .hat-cap { width: 60px; height: 25px; top: -5px; left: 0; background: #1976d2; border-radius: 20px 20px 0 0; }
+        .hat-cap::after { content: ''; position: absolute; bottom: 0; right: -10px; width: 30px; height: 8px; background: #1976d2; border-radius: 0 10px 10px 0; }
+        .hat-shades { width: 44px; height: 12px; top: 32px; left: 8px; background: #333; border-radius: 5px; z-index: 20; }
 
         /* --- WORLD --- */
         #game-world { width: 100%; height: 100%; position: relative; background: #000; overflow: hidden; }
-        .wall { height: 40%; width: 100%; position: relative; border-bottom: 12px solid #eee; display: flex; justify-content: space-around; align-items: center; }
-        .painting { width: 65px; height: 85px; background: #fff; border: 6px solid #5d4037; box-shadow: 2px 4px 10px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .floor { height: 60%; width: 100%; position: relative; cursor: crosshair; }
+        .wall { height: 40%; width: 100%; position: relative; border-bottom: 15px solid #eee; display: flex; justify-content: space-around; align-items: center; transition: 0.5s; }
+        
+        /* PAINTINGS */
+        .painting { 
+            width: 75px; height: 95px; background: #fff; 
+            border: 6px solid #5d4037; box-shadow: 2px 4px 10px rgba(0,0,0,0.3); 
+            background-size: cover; background-position: center; transition: 0.3s;
+        }
+        /* Class to center a single painting */
+        .painting-center { margin: 0 auto; }
 
+        .floor { height: 60%; width: 100%; position: relative; cursor: crosshair; transition: 0.5s; }
+
+        /* IMPROVED PEDESTALS */
         .pedestal-group { position: absolute; width: 160px; height: 160px; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; z-index: 5; }
         .proximity-circle { position: absolute; width: 150px; height: 80px; border: 4px dashed rgba(255,255,255,0.4); border-radius: 50%; top: 60%; left: 50%; transform: translate(-50%, -50%); transition: 0.3s; pointer-events: none; }
         .near-player .proximity-circle { border: 5px solid var(--accent); background: rgba(255,112,67,0.15); box-shadow: 0 0 20px var(--accent); }
-        .pedestal { width: 60px; height: 45px; background: linear-gradient(to right, #ccc, #fff, #ccc); border-radius: 4px; position: relative; z-index: 10; pointer-events: none;}
-        .artifact-item { font-size: 2.8rem; margin-bottom: 5px; z-index: 11; filter: grayscale(100%) opacity(0.5); animation: float 3s ease-in-out infinite; transition: 0.4s; }
-        .unlocked .artifact-item { filter: grayscale(0%) opacity(1); text-shadow: 0 0 15px gold; }
+        
+        .pedestal { 
+            width: 70px; height: 55px; 
+            /* Marble Texture */
+            background: 
+                radial-gradient(circle at 50% 0, rgba(255,255,255,0.9), transparent 70%),
+                linear-gradient(to bottom, #e0e0e0, #bdbdbd, #9e9e9e);
+            background-size: 100% 100%, 20px 20px;
+            border-radius: 4px; box-shadow: 0 8px 15px rgba(0,0,0,0.4);
+            position: relative; z-index: 10; pointer-events: none;
+            border-top: 4px solid #f5f5f5;
+        }
+        /* Top Slab */
+        .pedestal::before { content: ''; position: absolute; top: -12px; left: -10px; width: 90px; height: 12px; background: linear-gradient(to bottom, #fff, #e0e0e0); border-radius: 4px; box-shadow: 0 5px 5px rgba(0,0,0,0.2); }
 
-        /* --- VALENTINE COUPON --- */
-        .coupon-card { background: white; border: 8px double #ff8a80; padding: 30px; border-radius: 15px; max-width: 350px; box-shadow: 10px 10px 0px #ffcdd2; position: relative; }
+        .artifact-item { font-size: 3rem; margin-bottom: 8px; z-index: 11; filter: grayscale(100%) opacity(0.5) drop-shadow(0 5px 5px rgba(0,0,0,0.5)); animation: float 3s ease-in-out infinite; transition: 0.4s; }
+        .unlocked .artifact-item { filter: grayscale(0%) opacity(1) drop-shadow(0 0 15px gold); }
+
+        /* --- DOOR TRANSITION --- */
+        #door-transition {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 500; display: flex; pointer-events: none;
+        }
+        .door-panel {
+            width: 50%; height: 100%; background: var(--wood);
+            background-image: repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 2px, transparent 2px, transparent 10px);
+            border: 5px solid #3e2723; box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
+            position: relative; transition: transform 1s ease-in-out;
+        }
+        .door-left { transform: translateX(-100%); border-right: 2px solid #3e2723; }
+        .door-right { transform: translateX(100%); border-left: 2px solid #3e2723; }
+        
+        .doors-closed .door-left { transform: translateX(0); }
+        .doors-closed .door-right { transform: translateX(0); }
+
+        .room-label-plaque {
+            position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%) scale(0);
+            background: #fdf6e3; padding: 15px 30px; border: 4px solid var(--gold);
+            font-family: 'Cinzel', serif; font-weight: bold; font-size: 1.5rem; color: var(--wood);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 501; transition: transform 0.5s 0.5s;
+        }
+        .doors-closed .room-label-plaque { transform: translate(-50%, -50%) scale(1); }
+
+        /* --- VALENTINE & CANVAS --- */
+        .coupon-card { background: white; border: 8px double #ff8a80; padding: 25px; border-radius: 15px; max-width: 350px; box-shadow: 10px 10px 0px #ffcdd2; position: relative; }
         .coupon-card h2 { font-family: 'Pacifico', cursive; color: #d32f2f; margin: 0; }
         .stamp { position: absolute; bottom: -10px; right: -10px; transform: rotate(-15deg); background: #d32f2f; color: white; padding: 5px 15px; font-weight: bold; border-radius: 5px; border: 2px dashed white; }
+
+        /* Hidden canvas for generating image */
+        #certificate-canvas { display: none; }
 
         .particle { position: absolute; pointer-events: none; z-index: 200; font-size: 1.5rem; animation: particle-fly 1s ease-out forwards; }
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
@@ -63,6 +121,8 @@
         .t3-wall { background: #e8eaf6; } .t3-floor { background: #c5cae9; }
         .t4-wall { background: #eceff1; } .t4-floor { background: #b0bec5; }
         .t5-wall { background: #fffde7; } .t5-floor { background: #fff59d; }
+        .option-btn { width:45px; height:45px; border-radius:10px; border:2px solid #ddd; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:1.2rem; background:white; }
+        .option-btn:active { transform:scale(0.9); }
     </style>
 </head>
 <body>
@@ -72,8 +132,14 @@
         <div class="hud-item" style="color: #d32f2f;">💋 <span id="kisses">0</span></div>
     </div>
 
+    <div id="door-transition">
+        <div class="door-panel door-left"></div>
+        <div class="door-panel door-right"></div>
+        <div class="room-label-plaque" id="transition-label">Entering Room...</div>
+    </div>
+
     <div id="screen-creator" class="screen">
-        <h2>Valentine Guestbook</h2>
+        <h2>Guestbook</h2>
         <div style="display:flex; flex-direction:column; gap:8px; width:260px; margin-bottom: 10px;">
             <input type="text" id="fname" placeholder="First Name" style="padding:10px; border-radius:10px; border:2px solid #ddd; text-align:center;">
             <input type="text" id="lname" placeholder="Last Name" style="padding:10px; border-radius:10px; border:2px solid #ddd; text-align:center;">
@@ -81,32 +147,36 @@
 
         <div style="height:140px; width:100px; position:relative; margin:10px;">
             <div class="chibi" style="left:50%; top:100%;">
-                <div class="c-hat hat-p1" id="p-hat"></div>
+                <div class="c-hat hat-beanie" id="p-hat"></div>
                 <div class="c-head"><div class="c-face"><div class="c-eye left"></div><div class="c-eye right"></div><div class="c-mouth"></div></div></div>
-                <div class="c-body" id="p-body"></div>
+                <div class="c-body outfit-dress" id="p-body"></div>
             </div>
         </div>
 
-        <p style="margin:2px; font-weight:bold;">Pick Hat & Outfit:</p>
+        <p style="margin:2px; font-weight:bold; font-size:0.9rem;">Accessories</p>
         <div style="display:flex; gap:10px; margin-bottom: 10px;">
-            <div class="hat-p1" style="width:35px; height:35px; border-radius:50%; cursor:pointer;" onclick="setHat('hat-p1')"></div>
-            <div class="hat-p2" style="width:35px; height:35px; border-radius:50%; cursor:pointer;" onclick="setHat('hat-p2')"></div>
-            <div class="hat-p3" style="width:35px; height:35px; border-radius:50%; cursor:pointer;" onclick="setHat('hat-p3')"></div>
+            <div class="option-btn" onclick="setHat('hat-beanie')" title="Beanie">🧶</div>
+            <div class="option-btn" onclick="setHat('hat-broad')" title="Broad Hat">👒</div>
+            <div class="option-btn" onclick="setHat('hat-cap')" title="Cap">🧢</div>
+            <div class="option-btn" onclick="setHat('hat-shades')" title="Sunglasses">🕶️</div>
         </div>
+
+        <p style="margin:2px; font-weight:bold; font-size:0.9rem;">Outfit Style</p>
         <div style="display:flex; gap:10px; margin-bottom: 20px;">
-            <div class="dress-1" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-1')"></div>
-            <div class="dress-2" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-2')"></div>
-            <div class="dress-3" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-3')"></div>
-            <div class="dress-4" style="width:35px; height:35px; border-radius:10px; cursor:pointer;" onclick="setDress('dress-4')"></div>
+            <div class="option-btn" onclick="setDress('outfit-dress')" title="Dress">👗</div>
+            <div class="option-btn" onclick="setDress('outfit-jeans')" title="Tee & Jeans">👖</div>
+            <div class="option-btn" onclick="setDress('outfit-overall')" title="Overalls">👘</div>
+            <div class="option-btn" onclick="setDress('outfit-hoodie')" title="Hoodie">🧥</div>
         </div>
+        
         <button onclick="startGame()" style="padding:12px 40px; border-radius:30px; background:var(--accent); color:white; border:none; font-weight:bold; cursor:pointer;">Enter Museum</button>
     </div>
 
     <div id="game-world" class="hidden">
         <div class="wall" id="room-wall">
-            <div class="painting">🎨</div>
-            <div id="room-name" style="background:white; padding:10px 20px; border-radius:10px; border:3px solid #5d4037; font-weight:bold;">Gallery</div>
-            <div class="painting">📸</div>
+            <div class="painting" id="painting-1"></div>
+            <div id="room-name" style="background:white; padding:10px 20px; border-radius:10px; border:3px solid #5d4037; font-weight:bold; font-family: 'Cinzel', serif;">Gallery</div>
+            <div class="painting" id="painting-2"></div>
         </div>
         <div class="floor" id="room-floor" onclick="handleFloorClick(event)">
             <div id="player" class="chibi" style="left:50%; top:90%;">
@@ -116,57 +186,83 @@
             </div>
             <div id="artifacts-layer"></div>
         </div>
-        <button id="btn-next" onclick="nextRoom()" style="position:absolute; bottom:25px; right:25px; padding:15px 35px; background:var(--accent); color:white; border:none; border-radius:30px; display:none; cursor:pointer; font-weight:bold;">Next Room ➜</button>
+        <button id="btn-next" onclick="nextRoomTransition()" style="position:absolute; bottom:25px; right:25px; padding:15px 35px; background:var(--accent); color:white; border:none; border-radius:30px; display:none; cursor:pointer; font-weight:bold; box-shadow: 0 4px 0 #bf360c;">Next Room ➜</button>
     </div>
 
     <div id="screen-proposal" class="screen hidden">
-        <h1 style="color:#d32f2f;">Final Step...</h1>
+        <h1 style="color:#d32f2f; font-family: 'Pacifico';">Final Step...</h1>
         <div style="background:white; padding:30px; border-radius:20px; border:4px solid var(--accent); max-width:350px;">
             <h3>Will you be my Valentine?</h3>
             <select id="v-choice" style="padding:10px; width:100%; border-radius:10px; margin-bottom:15px; font-size:1.1rem;">
                 <option value="yes">Yes</option>
                 <option value="YES">YES</option>
             </select>
-            <label style="display:block; margin-bottom:20px; font-size:0.9rem;">
-                <input type="checkbox" id="money-agree"> I agree to send Dedso rupiya (₹150)
+            <label style="display:block; margin-bottom:20px; font-size:0.9rem; background:#ffebee; padding:10px; border-radius:5px;">
+                <input type="checkbox" id="money-agree"> I agree to send Dedso rupiya (₹150) as tribute.
             </label>
-            <button onclick="showFinale()" style="background:#d32f2f; color:white; padding:12px 30px; border:none; border-radius:10px; font-weight:bold;">SIGN & CLAIM</button>
+            <button onclick="showFinale()" style="background:#d32f2f; color:white; padding:12px 30px; border:none; border-radius:10px; font-weight:bold; cursor: pointer;">SIGN & CLAIM</button>
         </div>
     </div>
 
     <div id="screen-finale" class="screen hidden" style="background:#ffebee;">
-        <div class="coupon-card">
-            <h2>Love Coupon</h2>
-            <p>This coupon entitles the bearer to:</p>
-            <h1 style="margin:10px 0; color:#ff7043;">ONE INFINITE HUG</h1>
-            <p>And a lifetime of memories.</p>
-            <hr>
-            <p>Issued to: <b id="final-name"></b></p>
-            <p>Score: <b id="final-kisses"></b> Kisses 💋</p>
-            <div class="stamp">OFFICIAL YES</div>
+        <div class="coupon-card" id="final-coupon-display">
+            <h2>Love Certificate</h2>
+            <p style="margin-top:10px;">This certifies that</p>
+            <h3 id="final-name" style="margin:5px 0; color:#d32f2f;"></h3>
+            <p>Has completed the Museum Tour and is entitled to:</p>
+            <h1 style="margin:10px 0; color:#d32f2f; font-size:1.8rem; font-family:'Cinzel';">10,000 KISSES</h1>
+            <p style="font-size:0.8rem; color:#555;">(Redeemable immediately & forever)</p>
+            <hr style="border:1px dashed #ff8a80; margin: 15px 0;">
+             <p style="font-size:0.8rem;">Total Score: <b id="final-kisses"></b> 💋 | Dedso Rupiya: <b id="final-dedso">Waiting</b></p>
+            <div class="stamp">APPROVED</div>
         </div>
-        <button onclick="location.reload()" style="margin-top:30px; color:#d32f2f; background:none; border:none; text-decoration:underline;">Revisit Memories</button>
+        <button id="download-btn" onclick="downloadCertificate()" style="margin-top:30px; background:var(--accent); color:white; padding:12px 25px; border-radius:20px; border:none; font-weight:bold; cursor:pointer; box-shadow: 0 4px 0 #bf360c;">📥 Download Certificate</button>
+        
+        <canvas id="certificate-canvas" width="600" height="400" style="display:none;"></canvas>
     </div>
 
     <div id="modal" class="screen hidden" style="background:rgba(0,0,0,0.6);">
-        <div style="background:white; padding:25px; border-radius:20px; width:85%; max-width:350px;">
-            <h3 id="m-title" style="color:var(--accent);">Memory</h3>
-            <p id="m-q" style="font-weight:bold;"></p>
-            <textarea id="m-ans" style="width:100%; height:80px; margin-bottom:15px; padding:10px; border-radius:10px; border:2px solid #ddd;" placeholder="Type here..."></textarea>
-            <button onclick="saveMemory()" style="background:var(--accent); color:white; padding:10px 20px; border:none; border-radius:10px; font-weight:bold;">Unlock Memory</button>
+        <div style="background:white; padding:25px; border-radius:20px; width:85%; max-width:350px; border: 4px solid var(--wood);">
+            <h3 id="m-title" style="color:var(--accent); margin-top:0;">Memory</h3>
+            <p id="m-q" style="font-weight:bold; color:#5d4037;"></p>
+            <textarea id="m-ans" style="width:100%; height:80px; margin-bottom:15px; padding:10px; border-radius:10px; border:2px solid #ddd; font-family:inherit;" placeholder="Type here..."></textarea>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button onclick="closeModal()" style="background:#eee; color:#555; padding:10px 20px; border:none; border-radius:10px; cursor:pointer;">Later</button>
+                <button onclick="saveMemory()" style="background:var(--accent); color:white; padding:10px 20px; border:none; border-radius:10px; font-weight:bold; cursor:pointer;">Unlock Memory</button>
+            </div>
         </div>
     </div>
 
     <script>
         const ROOMS = [
-            { name: "The Foundation", theme: "t1", icons: ["💌", "🌸", "☕"], questions: ["What was the very first thought you had when we met?", "What small habit of mine made you realize we were becoming close?", "What is a 'foundation' memory that makes you feel safe with us?"] },
-            { name: "The Spark", theme: "t2", icons: ["💫", "🌙", "🎵"], questions: ["Recall the moment the 'spark' turned into a fire. Where were we?", "What song instantly takes you back to our earliest days?", "What was the most 'magical' date we've ever been on?"] },
-            { name: "Distance", theme: "t3", icons: ["📱", "✈️", "💝"], questions: ["What was the hardest part of being apart, and how did we fix it?", "Describe seeing me for the first time after a long time away.", "What is a 'distance' lesson that made us stronger?"] },
-            { name: "Growing", theme: "t4", icons: ["🌱", "🌈", "🤝"], questions: ["What challenge we overcame are you most proud of?", "How have I helped you grow into the person you are today?", "What compromise made our life better?"] },
-            { name: "Forever", theme: "t5", icons: ["🏡", "🔮", "💍"], questions: ["What does our dream life look like in 10 years?", "What promise do you want to keep to me forever?", "What is the next big adventure you want to go on?"] }
+            { 
+                name: "The Foundation", theme: "t1", icons: ["💌", "🌸", "☕"], 
+                questions: ["What was the very first thought you had when we met?", "What small habit of mine made you realize we were becoming close?", "What is a 'foundation' memory that makes you feel safe with us?"],
+                art: ["https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg/402px-Mona_Lisa%2C_by_Leonardo_da_Vinci%2C_from_C2RMF_retouched.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Da_Vinci_Vitruve_Luc_Viatour.jpg/435px-Da_Vinci_Vitruve_Luc_Viatour.jpg"]
+            },
+            { 
+                name: "The Spark", theme: "t2", icons: ["💫", "🌙", "🎵"], 
+                questions: ["Recall the moment the 'spark' turned into a fire. Where were we?", "What song instantly takes you back to our earliest days?", "What was the most 'magical' date we've ever been on?"],
+                art: ["https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg/606px-Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Claude_Monet_1872_Impression%2C_Sunrise.jpg/640px-Claude_Monet_1872_Impression%2C_Sunrise.jpg"]
+            },
+            { 
+                name: "Distance", theme: "t3", icons: ["📱", "✈️", "💝"], 
+                questions: ["What was the hardest part of being apart, and how did we fix it?", "Describe seeing me for the first time after a long time away.", "What is a 'distance' lesson that made us stronger?"],
+                art: ["https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/Great_Wave_off_Kanagawa2.jpg/640px-Great_Wave_off_Kanagawa2.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Caspar_David_Friedrich_-_Wanderer_above_the_Sea_of_Fog_-_Google_Art_Project.jpg/484px-Caspar_David_Friedrich_-_Wanderer_above_the_Sea_of_Fog_-_Google_Art_Project.jpg"]
+            },
+            { 
+                name: "Growing", theme: "t4", icons: ["🌱", "🌈", "🤝"], 
+                questions: ["What challenge we overcame are you most proud of?", "How have I helped you grow into the person you are today?", "What compromise made our life better?"],
+                art: ["https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg/640px-A_Sunday_on_La_Grande_Jatte%2C_Georges_Seurat%2C_1884.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Auguste_Renoir_-_Le_D%C3%A9jeuner_des_canotiers_%28The_Luncheon_of_the_Boating_Party%29%2C_1881.jpg/640px-Auguste_Renoir_-_Le_D%C3%A9jeuner_des_canotiers_%28The_Luncheon_of_the_Boating_Party%29%2C_1881.jpg"]
+            },
+            { 
+                name: "Forever", theme: "t5", icons: ["🏡", "🔮", "💍"], 
+                questions: ["What does our dream life look like in 10 years?", "What promise do you want to keep to me forever?", "What is the next big adventure you want to go on?"],
+                art: ["https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg/421px-The_Kiss_-_Gustav_Klimt_-_Google_Cultural_Institute.jpg", "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg/640px-Sandro_Botticelli_-_La_nascita_di_Venere_-_Google_Art_Project_-_edited.jpg"]
+            }
         ];
 
-        let state = { room: 0, unlocked: [], kisses: 0, hat: 'hat-p1', dress: 'dress-1', fname: '', lname: '' };
+        let state = { room: 0, unlocked: [], kisses: 0, hat: 'hat-beanie', dress: 'outfit-dress', fname: '', lname: '', dedsoAgreed: false };
         let activeItem = null;
 
         function setHat(h) { state.hat = h; document.getElementById('p-hat').className = 'c-hat ' + h; }
@@ -176,7 +272,11 @@
             state.fname = document.getElementById('fname').value.trim();
             state.lname = document.getElementById('lname').value.trim();
             if(!state.fname || !state.lname) return alert("Sign the guestbook!");
-            if(state.fname.toLowerCase() === 'amena' && state.lname.toLowerCase() === 'farooq') state.kisses += 10;
+            
+            if(state.fname.toLowerCase() === 'amena' && state.lname.toLowerCase() === 'farooq') {
+                state.kisses += 10; alert("Bonus: +10 Kisses for Amena Farooq! ❤️");
+            }
+
             document.getElementById('screen-creator').classList.add('hidden');
             document.getElementById('game-world').classList.remove('hidden');
             document.getElementById('g-hat').className = 'c-hat ' + state.hat;
@@ -186,9 +286,25 @@
 
         function loadRoom() {
             const r = ROOMS[state.room];
-            document.getElementById('room-wall').className = 'wall ' + r.theme + '-wall';
+            const wall = document.getElementById('room-wall');
+            wall.className = 'wall ' + r.theme + '-wall';
             document.getElementById('room-floor').className = 'floor ' + r.theme + '-floor';
             document.getElementById('room-name').innerText = r.name;
+            
+            const p1 = document.getElementById('painting-1');
+            const p2 = document.getElementById('painting-2');
+            p1.style.backgroundImage = `url('${r.art[0]}')`;
+            p2.style.backgroundImage = `url('${r.art[1]}')`;
+
+            // Logic for single painting in middle rooms
+            if (state.room > 0 && state.room < 4) {
+                p2.style.display = 'none';
+                p1.classList.add('painting-center');
+            } else {
+                p2.style.display = 'flex';
+                p1.classList.remove('painting-center');
+            }
+
             const layer = document.getElementById('artifacts-layer');
             layer.innerHTML = '';
             const pos = [{x:25, y:35}, {x:50, y:70}, {x:75, y:35}];
@@ -219,7 +335,6 @@
         }
 
         function updateProximity(px, py) {
-            const r = ROOMS[state.room];
             const pos = [{x:25, y:35}, {x:50, y:70}, {x:75, y:35}];
             document.querySelectorAll('.pedestal-group').forEach((el, i) => {
                 const d = Math.sqrt(Math.pow(px - pos[i].x, 2) + Math.pow(py - pos[i].y, 2));
@@ -238,6 +353,8 @@
             }, 850);
         }
 
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
         function saveMemory() {
             if(!document.getElementById('m-ans').value) return;
             state.unlocked.push(activeItem.id); state.kisses++;
@@ -250,33 +367,98 @@
 
         function createParticles(x, y) {
             for(let i=0; i<8; i++) {
-                const p = document.createElement('div');
-                p.className = 'particle'; p.innerText = '❤️';
+                const p = document.createElement('div'); p.className = 'particle'; p.innerText = '❤️';
                 p.style.left = x + '%'; p.style.top = y + '%';
-                p.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px');
-                p.style.setProperty('--ty', (Math.random() * -150 - 50) + 'px');
-                document.getElementById('room-floor').appendChild(p);
-                setTimeout(() => p.remove(), 1000);
+                p.style.setProperty('--tx', (Math.random() * 100 - 50) + 'px'); p.style.setProperty('--ty', (Math.random() * -150 - 50) + 'px');
+                document.getElementById('room-floor').appendChild(p); setTimeout(() => p.remove(), 1000);
             }
         }
 
-        function nextRoom() {
-            state.room++;
-            if(state.room >= ROOMS.length) {
-                document.getElementById('game-world').classList.add('hidden');
-                document.getElementById('screen-proposal').classList.remove('hidden');
-            } else {
-                document.getElementById('btn-next').style.display = 'none';
-                loadRoom();
-            }
+        function nextRoomTransition() {
+            const doors = document.getElementById('door-transition');
+            const label = document.getElementById('transition-label');
+            doors.classList.add('doors-closed');
+            // Wait for doors to close, then change room data
+            setTimeout(() => {
+                state.room++;
+                if(state.room >= ROOMS.length) {
+                    document.getElementById('game-world').classList.add('hidden');
+                    document.getElementById('screen-proposal').classList.remove('hidden');
+                    doors.classList.remove('doors-closed'); // Reset doors
+                } else {
+                    label.innerText = ROOMS[state.room].name;
+                    document.getElementById('btn-next').style.display = 'none';
+                    loadRoom();
+                    // Wait a moment, then open doors
+                    setTimeout(() => {
+                         doors.classList.remove('doors-closed');
+                    }, 1000);
+                }
+            }, 1000); // Match transition time
         }
 
         function showFinale() {
-            if(!document.getElementById('money-agree').checked) return alert("You must agree to send the Dedso Rupiya!");
+            if(!document.getElementById('money-agree').checked) return alert("You must agree to send the Dedso Rupiya tribute!");
+            state.dedsoAgreed = true;
+            const choice = document.getElementById('v-choice').value;
+            const coupon = document.getElementById('final-coupon-display');
+            if(choice === 'YES') {
+                coupon.style.border = '8px double gold';
+                coupon.style.boxShadow = '10px 10px 0px #ffd54f';
+            }
             document.getElementById('screen-proposal').classList.add('hidden');
             document.getElementById('screen-finale').classList.remove('hidden');
             document.getElementById('final-name').innerText = state.fname + " " + state.lname;
             document.getElementById('final-kisses').innerText = state.kisses;
+            document.getElementById('final-dedso').innerText = "Agreed ✅";
+        }
+
+        function downloadCertificate() {
+            const canvas = document.getElementById('certificate-canvas');
+            const ctx = canvas.getContext('2d');
+            const name = state.fname + " " + state.lname;
+            const kisses = state.kisses;
+            const date = new Date().toLocaleDateString();
+
+            // Draw Certificate Background
+            ctx.fillStyle = '#fffbf0'; ctx.fillRect(0, 0, 600, 400);
+            // Draw Border
+            ctx.strokeStyle = '#ff8a80'; ctx.lineWidth = 10; ctx.strokeRect(10, 10, 580, 380);
+            ctx.strokeStyle = '#d32f2f'; ctx.lineWidth = 2; ctx.strokeRect(20, 20, 560, 360);
+
+            // Text Styles
+            ctx.fillStyle = '#d32f2f'; ctx.textAlign = 'center';
+
+            // Title
+            ctx.font = 'bold 40px Cinzel, serif'; ctx.fillText('Museum of Us', 300, 70);
+            ctx.font = '30px Pacifico, cursive'; ctx.fillText('Love Certificate', 300, 110);
+
+            // Body
+            ctx.fillStyle = '#5d4037'; ctx.font = '20px Nunito, sans-serif';
+            ctx.fillText('This certifies that', 300, 160);
+            ctx.font = 'bold 28px Nunito, sans-serif'; ctx.fillText(name, 300, 200);
+            ctx.font = '20px Nunito, sans-serif'; ctx.fillText('Is hereby entitled to', 300, 240);
+
+            // Prize
+            ctx.fillStyle = '#d32f2f'; ctx.font = 'bold 36px Cinzel, serif';
+            ctx.fillText('10,000 KISSES', 300, 290);
+
+            // Footer details
+            ctx.fillStyle = '#555'; ctx.font = '16px Nunito, sans-serif';
+            ctx.fillText(`Score: ${kisses} 💋  |  Dedso Rupiya: Agreed ✅  |  Date: ${date}`, 300, 350);
+
+            // Simulated Stamp
+            ctx.save(); ctx.translate(500, 350); ctx.rotate(-15 * Math.PI / 180);
+            ctx.fillStyle = '#d32f2f'; ctx.fillRect(-50, -20, 100, 40);
+            ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.strokeRect(-45, -15, 90, 30);
+            ctx.fillStyle = 'white'; ctx.font = 'bold 16px sans-serif'; ctx.fillText('APPROVED', 0, 5);
+            ctx.restore();
+
+            // Trigger Download
+            const link = document.createElement('a');
+            link.download = `Love_Certificate_${state.fname}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
         }
 
         function updateHUD() { document.getElementById('kisses').innerText = state.kisses; }
